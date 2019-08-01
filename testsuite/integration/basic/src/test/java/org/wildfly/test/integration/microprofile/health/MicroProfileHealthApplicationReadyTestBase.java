@@ -75,7 +75,8 @@ public abstract class MicroProfileHealthApplicationReadyTestBase {
     @Test
     @InSequence(1)
     public void testApplicationReadinessBeforeDeployment() throws Exception {
-        checkGlobalOutcome(managementClient, "check-ready", false, null);
+        // server will be considered ready as deployments corresponding to Arquillian have been deployed on the server
+        checkGlobalOutcome(managementClient, "check-ready", true, null);
 
         // deploy the archive
         deployer.deploy("MicroProfileHealthApplicationReadyTestBase");
@@ -97,7 +98,8 @@ public abstract class MicroProfileHealthApplicationReadyTestBase {
 
         deployer.undeploy("MicroProfileHealthApplicationReadyTestBase");
 
-        checkGlobalOutcome(managementClient, "check-ready", false, null);
+        // server is still be considered ready as deployments corresponding to Arquillian are still been deployed on the server
+        checkGlobalOutcome(managementClient, "check-ready", true, null);
     }
 
 }

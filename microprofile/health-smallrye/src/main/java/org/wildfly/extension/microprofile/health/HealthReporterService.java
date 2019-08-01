@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 
 import io.smallrye.health.ResponseProvider;
 import io.smallrye.health.SmallRyeHealthReporter;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.jboss.as.controller.CapabilityServiceBuilder;
 import org.jboss.as.controller.LocalModelControllerClient;
@@ -84,17 +85,20 @@ public class HealthReporterService implements Service<HealthReporter> {
 
         modelControllerClient = modelControllerClientFactory.get().createClient(managementExecutor.get());
 
-        healthReporter.addReadinessCheck(new ServerStateCheck(modelControllerClient));
-        healthReporter.addReadinessCheck(new NoBootErrorsCheck(modelControllerClient));
-        healthReporter.addReadinessCheck(new DeploymentsStatusCheck(modelControllerClient));
+        // MicroProfile Health supports the mp.health.disable-default-procedures to let users disable any vendor procedures
+        if (!ConfigProvider.getConfig().getOptionalValue("mp.health.disable-default-procedures", Boolean.class).orElse(false)) {
+            healthReporter.addServerReadinessCheck(new ServerStateCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());
+            healthReporter.addServerReadinessCheck(new NoBootErrorsCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());
+            healthReporter.addServerReadinessCheck(new DeploymentsStatusCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());
+        }
 
         HealthCheckResponse.setResponseProvider(new ResponseProvider());
     }
 
     @Override
     public void stop(StopContext context) {
-        this.modelControllerClient.close();
-        this.healthReporter = null;
+        modelControllerClient.close();
+        healthReporter = null;
         HealthCheckResponse.setResponseProvider(null);
     }
 
