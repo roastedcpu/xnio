@@ -55,10 +55,11 @@ public class MicroProfileHealthApplicationWithoutReadinessHTTPEndpointTestCase e
         try (CloseableHttpClient client = HttpClients.createDefault()) {
 
             CloseableHttpResponse resp = client.execute(new HttpGet(healthURL));
-            assertEquals(mustBeUP ? 200 : 503, resp.getStatusLine().getStatusCode());
 
             String content = EntityUtils.toString(resp.getEntity());
             resp.close();
+
+            assertEquals(mustBeUP ? 200 : 503, resp.getStatusLine().getStatusCode());
 
             try (
                     JsonReader jsonReader = Json.createReader(new StringReader(content))
