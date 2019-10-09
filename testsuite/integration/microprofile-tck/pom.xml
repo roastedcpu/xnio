@@ -47,6 +47,7 @@
     <modules>
         <module>config</module>
         <module>health</module>
+        <module>jwt</module>
         <module>metrics</module>
         <module>opentracing</module>
     </modules>
