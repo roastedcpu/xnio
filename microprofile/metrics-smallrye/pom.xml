@@ -24,13 +24,12 @@
 
     <parent>
         <groupId>org.jboss.eap</groupId>
-        <artifactId>jboss-eap-parent</artifactId>
+        <artifactId>wildfly-microprofile</artifactId>
         <!--
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
         -->
         <version>7.3.0.GA-redhat-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>wildfly-microprofile-metrics-smallrye</artifactId>
