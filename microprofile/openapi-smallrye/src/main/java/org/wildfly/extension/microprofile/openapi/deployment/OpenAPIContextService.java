@@ -31,7 +31,8 @@ import java.util.function.Supplier;
 import org.jboss.msc.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StopContext;
-import org.wildfly.extension.microprofile.openapi._private.MicroProfileOpenAPILogger;
+import org.wildfly.extension.microprofile.openapi.MicroProfileOpenAPIExtension;
+import org.wildfly.extension.microprofile.openapi.logging.MicroProfileOpenAPILogger;
 import org.wildfly.extension.undertow.Host;
 import org.wildfly.extension.undertow.UndertowService;
 
@@ -52,6 +53,8 @@ import io.undertow.util.StatusCodes;
  */
 public class OpenAPIContextService implements Service {
 
+    static final String OPENAPI_CONTEXT_SERVICE_SC_ATTR = OpenAPIContextService.class.getName();
+
     private static final String OAI = "/openapi";
     private static final String ALLOWED_METHODS = "GET, HEAD, OPTIONS";
     private static final String QUERY_PARAM_FORMAT = "format";
@@ -59,6 +62,8 @@ public class OpenAPIContextService implements Service {
     private final Supplier<UndertowService> undertowService;
     private final Supplier<DeploymentInfo> deploymentInfoService;
     private final Map<Format, String> cachedModels = new ConcurrentHashMap<>();
+    private final OpenAPIDocumentBuilder documentBuilder = new OpenAPIDocumentBuilder.create();
+    private OpenAPI document = null;
 
     OpenAPIContextService(Supplier<UndertowService> undertowService, Supplier<DeploymentInfo> deploymentInfoService) {
         this.undertowService = undertowService;
@@ -69,7 +74,7 @@ public class OpenAPIContextService implements Service {
     public void start(StartContext context) {
         runWithHost(host -> {
             host.registerHandler(OAI, new OpenAPIHandler());
-            MicroProfileOpenAPILogger.LOGGER.documentPathRegistered(OAI, host.getName());
+            MicroProfileOpenAPILogger.LOGGER.endpointRegistered(host.getName());
         });
     }
 
@@ -77,7 +82,7 @@ public class OpenAPIContextService implements Service {
     public void stop(StopContext context) {
         runWithHost(host -> {
             host.unregisterHandler(OAI);
-            MicroProfileOpenAPILogger.LOGGER.documentPathUnregistered(OAI, host.getName());
+            MicroProfileOpenAPILogger.LOGGER.endpointUnregistered(host.getName());
         });
     }
 
@@ -149,7 +154,8 @@ public class OpenAPIContextService implements Service {
             try {
                 return OpenApiSerializer.serialize(OpenApiDocument.INSTANCE.get(), format);
             } catch (IOException e) {
-                throw new RuntimeException("Unable to serialize OpenAPI in " + format, e);
+                MicroProfileOpenAPILogger.LOGGER.serializationException(format, e);
+                return null;
             }
         }
 
