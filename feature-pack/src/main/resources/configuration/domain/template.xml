@@ -95,6 +95,7 @@
                 <extension module="org.wildfly.extension.io"/>
                 <extension module="org.wildfly.extension.messaging-activemq"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -121,6 +122,7 @@
                 <extension module="org.wildfly.extension.io"/>
                 <extension module="org.wildfly.extension.messaging-activemq"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -146,6 +148,7 @@
                 <extension module="org.wildfly.extension.io"/>
                 <extension module="org.wildfly.extension.messaging-activemq"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -171,6 +174,7 @@
                 <extension module="org.wildfly.extension.io"/>
                 <extension module="org.wildfly.extension.messaging-activemq"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -203,6 +207,7 @@
                 <extension module="org.wildfly.extension.datasources-agroal" />
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye" />
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye" />
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -212,6 +217,7 @@
             <host-release id="EAP7.2"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
             </excluded-extensions>
         </host-exclude>
