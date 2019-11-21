@@ -55,6 +55,5 @@
         <module name="org.jboss.staxmapper"/>
         <module name="org.jboss.vfs"/>
         <module name="org.wildfly.extension.undertow"/>
-        <module name="org.wildfly.security.elytron-private"/>
     </dependencies>
 </module>
