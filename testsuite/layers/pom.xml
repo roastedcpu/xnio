@@ -104,13 +104,6 @@
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
                             </feature-packs>
                             <configurations>
                                 <config>
@@ -145,13 +138,6 @@
                                     <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
                                     <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
                                     <version>${testsuite.ee.galleon.pack.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -266,13 +252,6 @@
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
                             </feature-packs>
                             <configurations>
                                 <config>
@@ -307,13 +286,6 @@
                                     <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
                                     <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
                                     <version>${testsuite.ee.galleon.pack.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -466,13 +438,6 @@
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
                             </feature-packs>
                             <configurations>
                                 <config>
@@ -507,13 +472,6 @@
                                     <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
                                     <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
                                     <version>${testsuite.ee.galleon.pack.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -663,13 +621,6 @@
                                     <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
                                     <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
                                     <version>${testsuite.ee.galleon.pack.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-test-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>

@@ -162,6 +162,13 @@ Layers that you combine with "use-case tailored" layers to extend the capabiliti
 
 * _web-clustering_: Infinispan-based web session clustering.
 
+
+Decorator layers:
+
+Layers that you combine with "use-case tailored" layers to extend the capabilities of the provisioned server.
+
+* _web-clustering_: Infinispan-based web session clustering.
+
 ==== WildFly servlet layers
 
 Basic layers:
