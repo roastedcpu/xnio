@@ -28,42 +28,28 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jboss.eap</groupId>
-        <artifactId>jboss-eap-parent</artifactId>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-parent</artifactId>
         <!--
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
         -->
-        <version>7.3.0.GA-redhat-SNAPSHOT</version>
+        <version>19.0.0.Beta2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>wildfly-ee-dist</artifactId>
-    <name>WildFly: EE Full Distribution</name>
+    <artifactId>wildfly-dist</artifactId>
+    <name>WildFly: Distribution</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>org.jboss.universe.producer</groupId>
-            <artifactId>jboss-eap-producers</artifactId>
-            <scope>runtime</scope>
-            <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.universe</groupId>
-            <artifactId>product-universe</artifactId>
-            <scope>runtime</scope>
-            <type>pom</type>
-        </dependency>
-
-        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-ee-galleon-pack</artifactId>
+            <artifactId>wildfly-galleon-pack</artifactId>
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-ee-galleon-pack</artifactId>
+            <artifactId>wildfly-galleon-pack</artifactId>
             <type>zip</type>
             <exclusions>
                 <exclusion>
@@ -71,12 +57,6 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.migration</groupId>
-            <artifactId>jboss-server-migration-eap7.3-galleon-pack</artifactId>
-            <version>${version.org.jboss.migration}</version>
-            <type>zip</type>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -112,25 +92,19 @@
                                 <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
                             </plugin-options>
                             <feature-packs>
-                                <!-- Specify the core-galleon-pack to confirm we want our version and not the one from jboss-server-migration -->
                                 <feature-pack>
                                     <transitive>true</transitive>
-                                    <groupId>org.wildfly.core</groupId>
-                                    <artifactId>wildfly-core-galleon-pack</artifactId>
-                                    <version>${version.org.wildfly.core}</version>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>org.jboss.migration</groupId>
-                                    <artifactId>jboss-server-migration-eap7.3-galleon-pack</artifactId>
-                                    <version>${version.org.jboss.migration}</version>
-                                </feature-pack>
-                                <feature-pack>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>wildfly-ee-galleon-pack</artifactId>
                                     <version>${project.version}</version>
                                     <included-packages>
                                         <name>docs.examples.configs</name>
                                     </included-packages>
+                                </feature-pack>
+                                <feature-pack>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>wildfly-galleon-pack</artifactId>
+                                    <version>${project.version}</version>
                                 </feature-pack>
                             </feature-packs>
                         </configuration>
@@ -229,7 +203,7 @@
                                     <excluded-licenses-versions>.*redhat-.*</excluded-licenses-versions>
                                     <offline>${org.wildfly.galleon-plugins.offline}</offline>
                                     <fpGroupId>${project.groupId}</fpGroupId>
-                                    <fpArtifactId>wildfly-ee-galleon-pack</fpArtifactId>
+                                    <fpArtifactId>wildfly-galleon-pack</fpArtifactId>
                                     <fpVersion>${project.version}</fpVersion>
                                     <extra-artifacts>
                                         <artifact>
