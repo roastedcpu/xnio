@@ -30,6 +30,9 @@ limitations under the License.
        'verifier.product.release.version' property
     8) JBossEULA.txt exists
     9) version.txt exists
+    10) copyright.txt does not exist
+    11) README.txt does not exist
+    12) docs/contrib does not exist
 -->
   <files>
     <file>
@@ -71,6 +74,18 @@ limitations under the License.
     <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/version.txt</location>
       <exists>true</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/copyright.txt</location>
+      <exists>false</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/README.txt</location>
+      <exists>false</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/docs/contrib/scripts</location>
+      <exists>false</exists>
     </file>
   </files>
 </verifications>
