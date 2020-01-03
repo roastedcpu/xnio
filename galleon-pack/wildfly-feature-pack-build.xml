@@ -48,6 +48,7 @@
                 <include name="modules.all"/>
                 <include name="product.conf"/>
                 <include name="JBossEULA.txt"/>
+                <include name="version.txt"/>
             </packages>
             <default-configs inherit="false">
                 <include name="standalone.xml" model="standalone"/>
