@@ -204,7 +204,7 @@
         <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
         <version.help.plugin>2.2</version.help.plugin>
         <version.jacoco.plugin>0.8.2</version.jacoco.plugin><!-- TODO property does not follow verion.groupId format -->
-        <version.org.jboss.galleon>4.2.1.Final</version.org.jboss.galleon>
+        <version.org.jboss.galleon>4.2.2.Final</version.org.jboss.galleon>
         <!--
              The following two variables could have been removed using the project.version as version for the EAP Producers and Universe maven artifacts.
              However, Galleon does not allow us creating an Universe with produces with -SNAPSHOT qualifier, so we have to define the version "manually" here.
