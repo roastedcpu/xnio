@@ -236,18 +236,6 @@
                         </executions>
                         <dependencies>
                             <dependency>
-                                <groupId>org.jboss.universe</groupId>
-                                <artifactId>product-universe</artifactId>
-                                <version>${version.org.jboss.universe.product-universe}</version>
-                                <scope>runtime</scope>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.jboss.universe.producer</groupId>
-                                <artifactId>jboss-eap-producers</artifactId>
-                                <version>${version.org.jboss.universe.producer.jboss-eap-producers}</version>
-                                <scope>runtime</scope>
-                            </dependency>
-                            <dependency>
                                 <groupId>org.wildfly.core</groupId>
                                 <artifactId>wildfly-core-galleon-pack</artifactId>
                                 <version>${version.org.wildfly.core}</version>
