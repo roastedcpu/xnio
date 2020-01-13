@@ -94,7 +94,6 @@
                 <extension>org.wildfly.extension.ee-security</extension>
                 <extension>org.wildfly.extension.messaging-activemq</extension>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
-                <extension>org.wildfly.extension.microprofile.fault-tolerance-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.health-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.jwt-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.metrics-smallrye</extension>
@@ -129,7 +128,6 @@
                 <extension>org.wildfly.extension.ee-security</extension>
                 <extension>org.wildfly.extension.messaging-activemq</extension>
                 <extension>org.wildfly.extension.microprofile.config-smallrye</extension>
-                <extension>org.wildfly.extension.microprofile.fault-tolerance-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.health-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.jwt-smallrye</extension>
                 <extension>org.wildfly.extension.microprofile.metrics-smallrye</extension>

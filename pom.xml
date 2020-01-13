@@ -1061,17 +1061,17 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-microprofile-fault-tolerance-smallrye</artifactId>
-                <version>${project.version}</version>
+                <version>${full.maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-microprofile-fault-tolerance-smallrye-cdi</artifactId>
-                <version>${project.version}</version>
+                <version>${full.maven.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-microprofile-fault-tolerance-smallrye-extension</artifactId>
-                <version>${project.version}</version>
+                <version>${full.maven.version}</version>
             </dependency>
 
             <dependency>
