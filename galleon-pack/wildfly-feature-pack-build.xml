@@ -41,6 +41,7 @@
             <name>org.jboss.eap:wildfly-ee-galleon-pack</name>
             <packages inherit="false">
                 <exclude name="product.conf"/>
+                <exclude name="version.txt"/>
                 <!--exclude name="docs.licenses.merge"/-->
                 <include name="docs"/>
                 <!-- appclient is not referenced from standalone nor domain configuration models.-->
@@ -48,7 +49,6 @@
                 <include name="bin"/>
                 <include name="modules.all"/>
                 <include name="JBossEULA.txt"/>
-                <include name="version.txt"/>
             </packages>
             <default-configs inherit="false">
                 <include name="standalone.xml" model="standalone"/>
@@ -67,6 +67,7 @@
     <default-packages>
         <package name="docs.licenses.merge"/>
         <package name="product.conf"/>
+        <package name="version.txt"/>
     </default-packages>
     <package-schemas>
         <group name="org.jboss.as"/>
