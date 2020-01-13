@@ -1,1 +1,1 @@
-JBoss EAP continuous delivery - Version 7.3.0.CDxx
+Red Hat JBoss Enterprise Application Platform - Version 7.3.0.GA
