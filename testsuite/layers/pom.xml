@@ -63,8 +63,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -99,8 +99,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -143,8 +143,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -188,8 +188,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -225,8 +225,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -261,8 +261,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -305,8 +305,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -351,8 +351,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -388,8 +388,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -425,8 +425,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -461,8 +461,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -505,8 +505,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -551,8 +551,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -588,8 +588,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -661,8 +661,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1072,8 +1072,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1108,8 +1108,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1144,8 +1144,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1180,8 +1180,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1216,8 +1216,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1252,8 +1252,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1289,8 +1289,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1327,8 +1327,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1365,8 +1365,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1401,8 +1401,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1437,8 +1437,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1473,8 +1473,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1509,8 +1509,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1597,8 +1597,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1633,8 +1633,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1669,8 +1669,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1705,8 +1705,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1741,8 +1741,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
@@ -1777,8 +1777,8 @@
                             <feature-packs>
                                 <feature-pack>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-ee-galleon-pack</artifactId>
-                                    <version>${ee.maven.version}</version>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
