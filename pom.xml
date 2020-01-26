@@ -198,8 +198,8 @@
              that *could* be obtained solely from the wildfly-ee-galleon-pack or its dependencies.
              Test jobs can override this using -D to test using different feature pack.
         -->
-        <testsuite.ee.galleon.pack.artifactId>wildfly-galleon-pack</testsuite.ee.galleon.pack.artifactId>
-        <testsuite.ee.galleon.pack.version>${full.maven.version}</testsuite.ee.galleon.pack.version>
+        <testsuite.ee.galleon.pack.artifactId>wildfly-ee-galleon-pack</testsuite.ee.galleon.pack.artifactId>
+        <testsuite.ee.galleon.pack.version>${ee.maven.version}</testsuite.ee.galleon.pack.version>
 
         <!--
             *Plugin* Dependency versions. Please keep alphabetical.
