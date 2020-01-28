@@ -1508,7 +1508,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.smallrye</groupId>
+            <groupId>io.smallrye.config</groupId>
             <artifactId>smallrye-config</artifactId>
             <exclusions>
                 <exclusion>
@@ -1520,7 +1520,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.smallrye</groupId>
+            <groupId>io.smallrye.config</groupId>
             <artifactId>smallrye-config-common</artifactId>
             <exclusions>
                 <exclusion>
