@@ -23,7 +23,7 @@ limitations under the License.
        'full.dist.product.slot' property
     3) jboss-modules.jar must exist
     4) standalone/configuration/standalone.xml must exist
-    5) modules/system/layers/base/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF exists
+    5) modules/system/layers/microprofile/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF exists
     6) JBoss-Product-Release-Name key in manifest.mf above has value equal to the value of the
        'full.dist.product.release.name' property
     7) JBoss-Product-Release-Version key in manifest.mf has value starting with the value of the
@@ -33,6 +33,7 @@ limitations under the License.
     9) copyright.txt does not exist
     10) README.txt does not exist
     11) docs/contrib does not exist
+    12) bin/layers.conf contains layers=microprofile
 -->
   <files>
     <file>
@@ -44,11 +45,11 @@ limitations under the License.
       <contains>slot=${full.dist.product.slot}</contains>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF</location>
       <exists>true</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF</location>
       <contains>JBoss-Product-Release-Name: ${full.dist.product.release.name}</contains>
     </file>
     <file>
@@ -58,6 +59,10 @@ limitations under the License.
     <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/standalone/configuration/standalone.xml</location>
       <exists>true</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/layers.conf</location>
+      <contains>layers=microprofile</contains>
     </file>
   </files>
 </verifications>

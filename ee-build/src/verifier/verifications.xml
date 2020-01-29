@@ -56,75 +56,75 @@ limitations under the License.
       <exists>true</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/com/netflix/archaius/core/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/com/netflix/archaius/core/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/com/netflix/hystrix/core/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/com/netflix/hystrix/core/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/io/reactivex/rxjava/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/reactivex/rxjava/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/io/smallrye/fault-tolerance/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/smallrye/fault-tolerance/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/apache/commons/configuration/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/apache/commons/configuration/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/eclipse/microprofile/fault-tolerance/api/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/eclipse/microprofile/fault-tolerance/api/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/hdrhistrogram/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/hdrhistrogram/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/wildfly/extension/microprofile/fault-tolerance-smallrye/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/extension/microprofile/fault-tolerance-smallrye/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/wildfly/microprofile/fault-tolerance-smallrye</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/microprofile/fault-tolerance-smallrye</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/io/smallrye/openapi/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/smallrye/openapi/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/eclipse/microprofile/openapi/api/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/eclipse/microprofile/openapi/api/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/wildfly/extension/microprofile/openapi-smallrye/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/extension/microprofile/openapi-smallrye/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/io/smallrye/jwt/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/smallrye/jwt/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/bitbucket/jose4j/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/bitbucket/jose4j/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/eclipse/microprofile/jwt/auth/api/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/eclipse/microprofile/jwt/auth/api/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/wildfly/extension/microprofile/jwt-smallrye/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/extension/microprofile/jwt-smallrye/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/wildfly/security/elytron-jwt/main</location>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/security/elytron-jwt/main</location>
       <exists>false</exists>
     </file>
   </files>

@@ -3,6 +3,7 @@
 <config xmlns="urn:jboss:galleon:config:1.0" model="standalone">
     <packages>
         <package name="product.conf" optional="true"/>
+        <package name="layers.conf" optional="true"/>
         <package name="misc.standalone"/>
     </packages>
 </config>

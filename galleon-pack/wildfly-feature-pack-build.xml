@@ -60,6 +60,7 @@
     <default-packages>
         <package name="modules.all"/>
         <package name="docs.licenses.merge"/>
+        <package name="layers.conf"/>
         <package name="product.conf"/>
         <package name="version.txt"/>
     </default-packages>
