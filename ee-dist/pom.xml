@@ -41,19 +41,6 @@
     <name>WildFly: EE Full Distribution</name>
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.universe.producer</groupId>
-            <artifactId>jboss-eap-producers</artifactId>
-            <scope>runtime</scope>
-            <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.universe</groupId>
-            <artifactId>product-universe</artifactId>
-            <scope>runtime</scope>
-            <type>pom</type>
-        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>

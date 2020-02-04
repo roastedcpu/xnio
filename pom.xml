@@ -8755,22 +8755,6 @@
                 <version>${ee.maven.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.jboss.universe.producer</groupId>
-                <artifactId>jboss-eap-producers</artifactId>
-                <version>${version.org.jboss.universe.producer.jboss-eap-producers}</version>
-                <scope>runtime</scope>
-                <type>pom</type>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.universe</groupId>
-                <artifactId>product-universe</artifactId>
-                <version>${version.org.jboss.universe.product-universe}</version>
-                <scope>runtime</scope>
-                <type>pom</type>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
