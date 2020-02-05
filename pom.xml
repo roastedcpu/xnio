@@ -70,8 +70,6 @@
         <module>ee-galleon-pack</module>
         <module>ee-security</module>
         <module>ejb3</module>
-        <module>galleon-producers</module>
-        <module>galleon-universe</module>
         <module>feature-pack</module>
         <module>galleon-pack</module>
         <module>iiop-openjdk</module>
@@ -226,20 +224,6 @@
         <version.help.plugin>2.2</version.help.plugin>
         <version.jacoco.plugin>0.8.2</version.jacoco.plugin><!-- TODO property does not follow verion.groupId format -->
         <version.org.jboss.galleon>4.2.4.Final</version.org.jboss.galleon>
-        <!--
-             The following two variables could have been removed using the project.version as version for the EAP Producers and Universe maven artifacts.
-             However, Galleon does not allow us creating an Universe with produces with -SNAPSHOT qualifier, so we have to define the version "manually" here.
-             See https://issues.jboss.org/browse/GAL-291
-             We should not use variables to define the version in a maven artifact, a maven warning is logged in that case. In order to
-             avoid the warning, we have to keep in sync manually the values of these properties with the version value defined in org.jboss.universe.producer:jboss-eap-producers
-             and in org.jboss.universe:product-universe.
-             Once Galleon allows us define a -SNAPSHOT producers in a Universe, we can get the rid of those properties replacing them by ${project.version}
-             Initially, since we do not need a productized version of org.jboss.universe.producer:jboss-eap-producers and org.jboss.universe:product-universe,
-             that means no -redhat suffix, so we will use ${product.release.version} to set their initial values.
-         -->
-        <version.org.jboss.universe.producer.jboss-eap-producers>${product.release.version}</version.org.jboss.universe.producer.jboss-eap-producers>
-        <version.org.jboss.universe.product-universe>${product.release.version}</version.org.jboss.universe.product-universe>
-
         <version.org.wildfly.build-tools>1.2.12.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- This is used for the Galleon plugin. While it doesn't end up in the final distribution from any feature packs here,
