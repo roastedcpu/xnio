@@ -28,7 +28,7 @@
     </properties>
 
     <resources>
-        <artifact name="${org.wildfly:wildfly-microprofile-fault-tolerance-smallrye-cdi}"/>
+        <artifact name="${org.jboss.eap:wildfly-microprofile-fault-tolerance-smallrye-cdi}"/>
     </resources>
 
     <dependencies>

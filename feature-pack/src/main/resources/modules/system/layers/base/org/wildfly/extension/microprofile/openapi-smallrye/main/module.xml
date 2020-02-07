@@ -31,7 +31,7 @@
     </exports>
 
     <resources>
-        <artifact name="${org.wildfly:wildfly-microprofile-openapi-smallrye}"/>
+        <artifact name="${org.jboss.eap:wildfly-microprofile-openapi-smallrye}"/>
     </resources>
 
     <dependencies>
