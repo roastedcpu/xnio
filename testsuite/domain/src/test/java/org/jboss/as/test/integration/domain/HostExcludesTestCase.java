@@ -30,8 +30,11 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,10 +52,10 @@ import org.jboss.as.test.integration.domain.management.util.WildFlyManagedConfig
 import org.jboss.as.test.integration.management.util.MgmtOperationException;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
+import org.jboss.logging.Logger;
 import org.jboss.modules.LocalModuleLoader;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleLoadException;
-import org.jboss.modules.ModuleLoader;
 import org.jboss.modules.Resource;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -290,11 +293,8 @@ public class HostExcludesTestCase extends BuildConfigurationTestBase {
     }
 
     @Test
-    public void testHostExcludes() throws IOException, MgmtOperationException, ModuleLoadException {
-        final Path moduleDir = Paths.get(masterConfig.getModulePath()).resolve("system").resolve("layers").resolve("base");
-        LocalModuleLoader ml = new LocalModuleLoader(new File[]{moduleDir.normalize().toFile()});
-
-        Set<String> availableExtensions = retrieveAvailableExtensions(ml);
+    public void testHostExcludes() throws IOException, MgmtOperationException {
+        Set<String> availableExtensions = retrieveAvailableExtensions();
 
         ModelNode op = Util.getEmptyOperation(READ_CHILDREN_RESOURCES_OPERATION, null);
         op.get(CHILD_TYPE).set(EXTENSION);
@@ -365,21 +365,38 @@ public class HostExcludesTestCase extends BuildConfigurationTestBase {
      * It is assumed that the module which is added as an extension has the org.jboss.as.controller.Extension service as
      * a local resource.
      *
-     * @param ml
-     * @throws ModuleLoadException
      */
-    private Set<String> retrieveAvailableExtensions(ModuleLoader ml) throws ModuleLoadException {
-        Set<String> result = new HashSet<>();
+    private Set<String> retrieveAvailableExtensions() throws IOException {
+        final Set<String> result = new HashSet<>();
+        LocalModuleLoader ml = new LocalModuleLoader(getModuleRoots());
         Iterator<String> moduleNames = ml.iterateModules((String) null, true);
         while (moduleNames.hasNext()) {
             String moduleName = moduleNames.next();
-            Module module = ml.loadModule(moduleName);
-            List<Resource> resources = module.getClassLoader().loadResourceLocal("META-INF/services/org.jboss.as.controller.Extension");
-            if (!resources.isEmpty()) {
-                result.add(moduleName);
+            Module module = null;
+            try {
+                module = ml.loadModule(moduleName);
+                List<Resource> resources = module.getClassLoader().loadResourceLocal("META-INF/services/org.jboss.as.controller.Extension");
+                if (!resources.isEmpty()) {
+                    result.add(moduleName);
+                }
+            } catch (ModuleLoadException e) {
+                Logger.getLogger(HostExcludesTestCase.class).warn("Failed to load module " + moduleName +
+                        " to check if it is an extension", e);
             }
         }
-
         return result;
+    }
+
+    private static File[] getModuleRoots() throws IOException {
+        Path layersRoot = Paths.get(masterConfig.getModulePath()) .resolve("system").resolve("layers");
+        DirectoryStream.Filter<Path> filter = entry -> {
+            File f = entry.toFile();
+            return f.isDirectory() && !f.isHidden();
+        };
+        List<File> result = new ArrayList<>();
+        for (Path path : Files.newDirectoryStream(layersRoot, filter)) {
+            result.add(path.toFile());
+        }
+        return result.toArray(new File[0]);
     }
 }
