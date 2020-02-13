@@ -51,8 +51,10 @@ public class DomainAdjuster730 extends DomainAdjuster {
     }
 
     private void removeMicroProfileJWT(final List<ModelNode> list, final PathAddress subsystem) {
-        list.add(createRemoveOperation(subsystem));
-        list.add(createRemoveOperation(PathAddress.pathAddress(EXTENSION, "org.wildfly.extension.microprofile.jwt-smallrye")));
+        if (false) { // disable as EAP domain.xml does not include this
+            list.add(createRemoveOperation(subsystem));
+            list.add(createRemoveOperation(PathAddress.pathAddress(EXTENSION, "org.wildfly.extension.microprofile.jwt-smallrye")));
+        }
     }
 
 }
