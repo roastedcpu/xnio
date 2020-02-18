@@ -66,6 +66,7 @@
         <package name="docs.licenses.merge"/>
         <package name="layers.conf"/>
         <package name="version.txt"/>
+        <package name="docs.examples"/>
     </default-packages>
     <package-schemas>
         <group name="org.jboss.as"/>
