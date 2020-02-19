@@ -35,6 +35,7 @@
         merge conflicts between commits changing the GA and those changing the V.
         -->
         <version>7.3.0.GA-redhat-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>wildfly-dist</artifactId>
@@ -103,7 +104,7 @@
                                     </included-packages>
                                 </feature-pack>
                                 <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
+                                    <groupId>${full.maven.groupId}</groupId>
                                     <artifactId>wildfly-galleon-pack</artifactId>
                                     <version>${full.maven.version}</version>
                                 </feature-pack>
@@ -203,7 +204,7 @@
                                     <output-licenses-file>${project.build.directory}/community-licenses.xml</output-licenses-file>
                                     <excluded-licenses-versions>.*redhat-.*</excluded-licenses-versions>
                                     <offline>${org.wildfly.galleon-plugins.offline}</offline>
-                                    <fpGroupId>${project.groupId}</fpGroupId>
+                                    <fpGroupId>${full.maven.groupId}</fpGroupId>
                                     <fpArtifactId>wildfly-galleon-pack</fpArtifactId>
                                     <fpVersion>${full.maven.version}</fpVersion>
                                     <extra-artifacts>
