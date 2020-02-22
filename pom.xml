@@ -5517,6 +5517,10 @@
                         <groupId>javax.inject</groupId>
                         <artifactId>javax.inject</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>javax.enterprise</groupId>
+                        <artifactId>cdi-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
