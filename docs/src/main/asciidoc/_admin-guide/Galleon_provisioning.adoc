@@ -139,6 +139,7 @@ Basic layers:
 * _microprofile-metrics_: Support for MicroProfile Metrics.
 * _observability_: Support for MicroProfile monitoring and configuration features (Config, Health, Metrics, OpenTracing).
 * _open-tracing_: Support for MicroProfile OpenTracing. This layer is an optional dependency of the _observability_ layer.
+* _microprofile-health_: Support for MicroProfile Health.
 * _resource-adapters_: Support for deployment of JCA adapters.
 * _h2-driver_: Support for the H2 JDBC driver.
 * _h2-datasource_: Support for an H2 datasource. Depends on _h2-driver_.
