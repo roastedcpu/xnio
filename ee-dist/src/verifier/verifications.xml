@@ -69,31 +69,11 @@ limitations under the License.
       <exists>true</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/com/netflix/archaius/core/main</location>
-      <exists>false</exists>
-    </file>
-    <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/com/netflix/hystrix/core/main</location>
-      <exists>false</exists>
-    </file>
-    <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/reactivex/rxjava/main</location>
-      <exists>false</exists>
-    </file>
-    <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/io/smallrye/fault-tolerance/main</location>
       <exists>false</exists>
     </file>
     <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/apache/commons/configuration/main</location>
-      <exists>false</exists>
-    </file>
-    <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/eclipse/microprofile/fault-tolerance/api/main</location>
-      <exists>false</exists>
-    </file>
-    <file>
-      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/hdrhistrogram/main</location>
       <exists>false</exists>
     </file>
     <file>
