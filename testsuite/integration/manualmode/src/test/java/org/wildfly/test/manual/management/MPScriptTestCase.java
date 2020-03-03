@@ -44,8 +44,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REA
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RECURSIVE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.test.shared.util.AssumeTestGroupUtil;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.wildfly.core.testrunner.Server;
 
 /**
@@ -67,6 +69,11 @@ public class MPScriptTestCase {
     private ServerController serverController;
 
     private String currentConfig;
+
+    @Before
+    public void check() {
+        AssumeTestGroupUtil.assumeElytronProfileEnabled();
+    }
 
     @Test
     public void test() throws Exception {
