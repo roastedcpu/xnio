@@ -28,13 +28,12 @@
 
     <parent>
         <groupId>org.jboss.eap</groupId>
-        <artifactId>jboss-eap-parent</artifactId>
+        <artifactId>wildfly-microprofile</artifactId>
         <!--
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
         -->
         <version>7.3.0.GA-redhat-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>wildfly-microprofile-fault-tolerance-smallrye</artifactId>
@@ -49,8 +48,5 @@
         <module>executor</module>
         <module>extension</module>
     </modules>
-
-    <!-- DO NOT PLACE CONFIGURATION IN THIS POM EXPECTING IT TO BE INHERITED BY SUB MODULES.
-         SUB MODULES MAY NOT USE THIS ARTIFACT AS THEIR PARENT -->
 
 </project>
