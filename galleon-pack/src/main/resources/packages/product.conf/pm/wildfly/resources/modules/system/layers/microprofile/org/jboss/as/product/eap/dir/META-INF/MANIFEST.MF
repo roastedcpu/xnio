@@ -1,3 +1,0 @@
-JBoss-Product-Release-Name: ${product.release.name}
-JBoss-Product-Release-Version: ${product.release.version}
-JBoss-Product-Console-Slot: eap
