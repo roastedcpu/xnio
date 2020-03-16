@@ -60,6 +60,12 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.jboss.migration</groupId>
+            <artifactId>jboss-server-migration-eap7.3-galleon-pack</artifactId>
+            <version>${version.org.jboss.migration}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -93,6 +99,18 @@
                                 <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
                             </plugin-options>
                             <feature-packs>
+                                <!-- Specify the core-galleon-pack to confirm we want our version and not the one from jboss-server-migration -->
+                                <feature-pack>
+                                    <transitive>true</transitive>
+                                    <groupId>org.wildfly.core</groupId>
+                                    <artifactId>wildfly-core-galleon-pack</artifactId>
+                                    <version>${version.org.wildfly.core}</version>
+                                </feature-pack>
+                                <feature-pack>
+                                    <groupId>org.jboss.migration</groupId>
+                                    <artifactId>jboss-server-migration-eap7.3-galleon-pack</artifactId>
+                                    <version>${version.org.jboss.migration}</version>
+                                </feature-pack>
                                 <feature-pack>
                                     <transitive>true</transitive>
                                     <groupId>${project.groupId}</groupId>
