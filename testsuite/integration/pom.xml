@@ -62,6 +62,7 @@
                 <module>web</module>
                 <module>smoke</module>
                 <module>basic</module>
+                <module>microprofile</module>
                 <module>microprofile-tck</module>
                 <module>vdx</module>
                 <module>iiop</module>
@@ -87,6 +88,7 @@
                 <module>web</module>
                 <module>smoke</module>
                 <module>basic</module>
+                <module>microprofile</module>
                 <module>microprofile-tck</module>
                 <module>vdx</module>
                 <module>clustering</module>
@@ -221,6 +223,19 @@
             <modules>
                 <module>basic</module>
                 <module>elytron</module>
+                <module>microprofile</module>
+                <module>microprofile-tck</module>
+                <module>clustering</module>
+            </modules>
+        </profile>
+
+        <!-- -Dts.standalone.microprofile -->
+        <profile>
+            <id>ts.integ.group.standalone.microprofile</id>
+            <activation><property><name>ts.standalone.microprofile</name></property></activation>
+            <modules>
+                <module>basic</module>
+                <module>microprofile</module>
                 <module>microprofile-tck</module>
                 <module>clustering</module>
             </modules>
@@ -249,6 +264,7 @@
             <id>ts.integ.group.microprofile</id>
             <activation><property><name>ts.microprofile</name></property></activation>
             <modules>
+                <module>microprofile</module>
                 <module>microprofile-tck</module>
             </modules>
         </profile>
@@ -430,11 +446,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>wildfly-testsuite-shared</artifactId>
         </dependency>
-
-      <!--  <dependency>
-            <groupId>org.jboss.arquillian.testenricher</groupId>
-            <artifactId>arquillian-testenricher-initialcontext</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>

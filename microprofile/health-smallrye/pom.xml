@@ -24,13 +24,12 @@
 
     <parent>
         <groupId>org.jboss.eap</groupId>
-        <artifactId>jboss-eap-parent</artifactId>
+        <artifactId>wildfly-microprofile</artifactId>
         <!--
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
         -->
         <version>7.3.0.GA-redhat-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>wildfly-microprofile-health-smallrye</artifactId>
@@ -51,8 +50,18 @@
             <artifactId>wildfly-server</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.microprofile.health</groupId>
             <artifactId>microprofile-health-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.smallrye</groupId>

@@ -36,7 +36,7 @@
 
     <artifactId>wildfly-test-galleon-pack</artifactId>
 
-    <name>WildFly:  Test Feature Pack</name>
+    <name>WildFly: Test Feature Pack</name>
     <packaging>pom</packaging>
     <description>
         Provides a Galleon feature pack for use in provisioning installations for testsuite use.
@@ -78,7 +78,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wildfly-galleon-pack</artifactId>
+            <artifactId>wildfly-ee-galleon-pack</artifactId>
             <type>pom</type>
             <exclusions>
                 <exclusion>

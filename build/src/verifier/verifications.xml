@@ -33,6 +33,7 @@ limitations under the License.
     9) copyright.txt does not exist
     10) README.txt does not exist
     11) docs/contrib does not exist
+    12) bin/layers.conf contains layers=microprofile
 -->
   <files>
     <file>
@@ -52,12 +53,20 @@ limitations under the License.
       <contains>JBoss-Product-Release-Name: ${full.dist.product.release.name}</contains>
     </file>
     <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/jboss/as/product/${full.dist.product.slot}/dir/META-INF/MANIFEST.MF</location>
+      <contains>JBoss-Product-Release-Version: ${verifier.product.release.version}</contains>
+    </file>
+    <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/jboss-modules.jar</location>
       <exists>true</exists>
     </file>
     <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/standalone/configuration/standalone.xml</location>
       <exists>true</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/layers.conf</location>
+      <contains>layers=microprofile</contains>
     </file>
   </files>
 </verifications>

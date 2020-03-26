@@ -29,10 +29,11 @@ limitations under the License.
     7) JBoss-Product-Release-Version key in manifest.mf has value starting with the value of the
        'verifier.product.release.version' property
     8) JBossEULA.txt exists
-    8) version.txt exists
-    9) copyright.txt does not exist
-    10) README.txt does not exist
-    11) docs/contrib does not exist
+    9) version.txt exists
+    10) copyright.txt does not exist
+    11) README.txt does not exist
+    12) docs/contrib does not exist
+    13) modules/layers.conf contains layers=microprofile
 -->
   <files>
     <file>
@@ -86,6 +87,10 @@ limitations under the License.
     <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/docs/contrib/scripts</location>
       <exists>false</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/layers.conf</location>
+      <contains>layers=microprofile</contains>
     </file>
   </files>
 </verifications>
