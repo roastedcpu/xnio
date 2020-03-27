@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import io.undertow.servlet.api.Deployment;
 import org.jboss.as.server.suspend.ServerActivity;
 import org.jboss.as.server.suspend.ServerActivityCallback;
+import org.jboss.as.server.suspend.SuspendController.State;
 import org.jboss.logging.Logger;
 import org.jboss.modcluster.container.Connector;
 import org.jboss.modcluster.container.ContainerEventHandler;
@@ -123,10 +124,16 @@ public class UndertowEventHandlerAdapterService implements UndertowEventListener
 
     private synchronized void onStart(Context context) {
         ContainerEventHandler handler = this.configuration.getContainerEventHandler();
+
         handler.add(context);
 
+        State state = this.configuration.getSuspendController().getState();
+
         // TODO break into onDeploymentAdd once implemented in Undertow
-        handler.start(context);
+        if(state == State.RUNNING) {
+            handler.start(context);
+        }
+
         this.contexts.add(context);
     }
 
