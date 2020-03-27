@@ -52,7 +52,7 @@ public class NonClusteredBeanExpirationScheduler<I, T> implements Scheduler<I> {
         this.batcher = batcher;
         this.remover = remover;
         this.expiration = expiration;
-        this.expirationTracker = expiration.getTimeout().isNegative()? null : new ExpirationTracker<>(expiration.getTimeout());
+        this.expirationTracker = expiration.getTimeout().isNegative() ? null : new ExpirationTracker<>(expiration.getTimeout());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class NonClusteredBeanExpirationScheduler<I, T> implements Scheduler<I> {
                         Runnable task = new ExpirationTask();
                         Duration timeout = this.expiration.getTimeout();
                         InfinispanEjbLogger.ROOT_LOGGER.tracef("Scheduling stateful session bean %s to expire in %s", id, timeout);
-                        expireTask = this.expiration.getExecutor().schedule(task, timeout.toMillis(), TimeUnit.MILLISECONDS);
+                        expireTask = this.expiration.getExecutor().schedule(task, timeout.toMillis() + 1, TimeUnit.MILLISECONDS);
                     }
                 }
             }
@@ -150,7 +150,7 @@ public class NonClusteredBeanExpirationScheduler<I, T> implements Scheduler<I> {
                 // check for expireTask being not null as well, because if
                 // expireTask is null, it means close() has been invoked
                 if (nextExpirationInMillis != -1 && expireTask != null) {
-                    expireTask = expiration.getExecutor().schedule(this, nextExpirationInMillis - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+                    expireTask = expiration.getExecutor().schedule(this, nextExpirationInMillis - System.currentTimeMillis() + 1, TimeUnit.MILLISECONDS);
                 } else {
                     expireTask = null;
                 }

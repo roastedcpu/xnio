@@ -98,10 +98,10 @@ public class SessionExpirationScheduler implements Scheduler {
                     this.expirationFutures.remove(sessionId);
                 }
             };
-            long seconds = !delay.isNegative() ? delay.getSeconds() + 1 : 0;
-            Logger.ROOT_LOGGER.tracef("Session %s will expire in %d sec", sessionId, seconds);
+            long millis = !delay.isNegative() ? delay.toMillis() + 1 : 0;
+            Logger.ROOT_LOGGER.tracef("Session %s will expire in %d ms", sessionId, millis);
             synchronized (task) {
-                this.expirationFutures.put(sessionId, this.executor.schedule(task, seconds, TimeUnit.SECONDS));
+                this.expirationFutures.put(sessionId, this.executor.schedule(task, millis, TimeUnit.MILLISECONDS));
             }
         }
     }
