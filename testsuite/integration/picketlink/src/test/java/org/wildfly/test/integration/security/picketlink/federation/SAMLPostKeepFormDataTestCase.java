@@ -27,6 +27,7 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -40,14 +41,20 @@ import org.jboss.as.test.integration.security.common.config.SecurityDomain;
 import org.jboss.as.test.integration.security.common.config.SecurityModule;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.wildfly.test.integration.security.picketlink.federation.util.FederationArchiveUtil.identityProvider;
 import static org.wildfly.test.integration.security.picketlink.federation.util.FederationArchiveUtil.serviceProvider;
@@ -71,6 +78,9 @@ public class SAMLPostKeepFormDataTestCase {
 
     private final String TEXT = "test12345";
 
+    @ClassRule
+    public static TemporaryFolder temp = new TemporaryFolder();
+
     @Deployment(name = "identity-provider")
     public static WebArchive deploymentIdP() {
         WebArchive identityProvider = identityProvider("idp.war");
@@ -93,13 +103,20 @@ public class SAMLPostKeepFormDataTestCase {
         WebArchive serviceProvider = serviceProvider("sp-post.war");
 
         serviceProvider.addAsWebResource(SAMLPostKeepFormDataTestCase.class.getResource("SAMLPostKeepFormData/sp/post-test-main.jsp"), "freezone/post-test-main.jsp");
+        serviceProvider.addAsWebResource(SAMLPostKeepFormDataTestCase.class.getResource("SAMLPostKeepFormData/sp/file-upload-main.jsp"), "file-upload-main.jsp");
         serviceProvider.addAsWebResource(SAMLPostKeepFormDataTestCase.class.getResource("SAMLPostKeepFormData/sp/index.jsp"), "index.jsp");
         serviceProvider.addAsWebInfResource(SAMLPostKeepFormDataTestCase.class.getResource("SAMLPostKeepFormData/sp/web.xml"), "web.xml");
+        serviceProvider.addClass(FileUploadServlet.class);
 
         serviceProvider.addAsWebInfResource(new StringAsset("<jboss-web>" + //
                 "<security-domain>SAMLPostKeepFormData-sp</security-domain>" +
                 "<valve><class-name>org.picketlink.identity.federation.bindings.tomcat.sp.ServiceProviderAuthenticator</class-name></valve>" +
                 "</jboss-web>"), "jboss-web.xml");
+        serviceProvider.addAsWebInfResource(new StringAsset("<jboss-deployment-structure>" + //
+                                                               "<deployment><dependencies>" +
+                                                                "<module name=\"org.jboss.xnio\"/>" +
+                                                               "</dependencies></deployment>" +
+                                                               "</jboss-deployment-structure>"), "jboss-deployment-structure.xml");
         serviceProvider.addAsWebResource(SAMLPostKeepFormDataTestCase.class.getResource("SAMLPostKeepFormData/sp/sp-metadata.xml"), "WEB-INF/picketlink.xml");
 
         return serviceProvider;
@@ -131,6 +148,54 @@ public class SAMLPostKeepFormDataTestCase {
         //it redirects to page, which should contain text sent in first form
         response = conversation.getCurrentPage();
         assertTrue("There should be a text '"+TEXT+"' from first form in response. " + response.getText(), response.getText().contains(TEXT));
+    }
+
+    @Test
+    @OperateOnDeployment("service-provider")
+    public void testUploadFile(@ArquillianResource URL url) throws Exception {
+
+        WebConversation conversation = login(url);
+
+        File file = generateTempFile(200 * 1024);
+
+        //send text as a value in post form
+        WebRequest request = new GetMethodWebRequest(url.toString()+"/file-upload-main.jsp");
+        WebResponse response = conversation.getResponse(request);
+        WebForm webForm = response.getForms()[0];
+        webForm.setParameter("test-data", file);
+        webForm.getSubmitButtons()[0].click();
+
+        //it redirects to page, which should contain text sent in first form
+        response = conversation.getCurrentPage();
+        System.out.println(response.getText());
+        assertEquals("Should be able to read the uploaded file's stream", 200, response.getResponseCode());
+    }
+
+    private File generateTempFile(int fileSize) throws IOException {
+        File file = temp.newFile();
+        long totalLength = 0;
+        try (PrintWriter pw = new PrintWriter(file, "UTF-8")) {
+            while (totalLength <= fileSize) {
+                String s = RandomStringUtils.randomAlphanumeric(10);
+                totalLength += s.getBytes().length;
+                pw.print(s);
+            }
+        }
+        return file;
+    }
+
+    private WebConversation login(@ArquillianResource URL url) throws IOException, SAXException {
+        WebRequest request = new GetMethodWebRequest(url.toString()+"/index.jsp");
+        WebConversation conversation = new WebConversation();
+        WebResponse response = conversation.getResponse(request);
+
+        response = conversation.getCurrentPage();
+        WebForm webForm = response.getForms()[0];
+        webForm.setParameter("j_username", TOMCAT);
+        webForm.setParameter("j_password", TOMCAT_PSWD);
+        webForm.getSubmitButtons()[0].click();
+
+        return conversation;
     }
 
     static class SecurityDomainsSetup extends AbstractSecurityDomainsServerSetupTask {
