@@ -331,7 +331,7 @@
         <version.org.apache.santuario>2.1.4.redhat-00001</version.org.apache.santuario>
         <version.org.apache.thrift>0.13.0.redhat-00002</version.org.apache.thrift>
         <version.org.apache.velocity>2.1.0.redhat-00001</version.org.apache.velocity>
-        <version.org.apache.ws.security>2.2.4.redhat-00001</version.org.apache.ws.security>
+        <version.org.apache.ws.security>2.2.5.redhat-00001</version.org.apache.ws.security>
         <version.org.apache.ws.xmlschema>2.2.4.redhat-00001</version.org.apache.ws.xmlschema>
         <version.org.apache.xalan>2.7.1.redhat-12</version.org.apache.xalan>
         <version.org.bitbucket.jose4j>0.6.5.redhat-00002</version.org.bitbucket.jose4j>
