@@ -357,7 +357,7 @@
         <version.org.glassfish.javax.enterprise.concurrent>1.0.0.redhat-1</version.org.glassfish.javax.enterprise.concurrent>
         <version.org.glassfish.soteria>1.0.1.redhat-00002</version.org.glassfish.soteria>
         <version.org.harmcrest>1.3</version.org.harmcrest>
-        <version.org.hibernate>5.3.14.Final-redhat-00001</version.org.hibernate>
+        <version.org.hibernate>5.3.16.Final-redhat-00001</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.5.Final-redhat-00002</version.org.hibernate.commons.annotations>
         <version.org.hibernate.search>5.10.7.Final-redhat-00001</version.org.hibernate.search>
         <version.org.hibernate.validator>6.0.18.Final-redhat-00001</version.org.hibernate.validator>
