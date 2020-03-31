@@ -400,7 +400,7 @@
         <version.org.jboss.spec.javax.xml.soap.jboss-saaj-api_1.3_spec>1.0.6.Final-redhat-1</version.org.jboss.spec.javax.xml.soap.jboss-saaj-api_1.3_spec>
         <version.org.jboss.spec.javax.xml.soap.jboss-saaj-api_1.4_spec>1.0.1.Final-redhat-00001</version.org.jboss.spec.javax.xml.soap.jboss-saaj-api_1.4_spec>
         <version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec>1.0.0.Final-redhat-1</version.org.jboss.spec.javax.xml.ws.jboss-jaxws-api_2.3_spec>
-        <version.org.jboss.weld.weld>3.1.2.Final-redhat-00001</version.org.jboss.weld.weld>
+        <version.org.jboss.weld.weld>3.1.4.Final-redhat-00001</version.org.jboss.weld.weld>
         <version.org.jboss.weld.weld-api>3.1.0.SP1-redhat-00001</version.org.jboss.weld.weld-api>
         <version.org.jboss.ws.api>1.1.2.Final-redhat-00001</version.org.jboss.ws.api>
         <version.org.jboss.ws.common>3.2.3.Final-redhat-00001</version.org.jboss.ws.common>
