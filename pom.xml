@@ -857,13 +857,6 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>wildfly-ejb-client-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-ejb3</artifactId>
                 <version>${project.version}</version>
                 <exclusions>
@@ -940,13 +933,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-jdr</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>wildfly-jms-client-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
             </dependency>
 
             <dependency>
