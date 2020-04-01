@@ -106,6 +106,8 @@
                             <fork-embedded>${galleon.fork.embedded}</fork-embedded>
                             <task-properties>
                                 <product.release.version>${full.dist.product.release.version}</product.release.version>
+                                <expansion.pack.release.name>${expansion.pack.release.name}</expansion.pack.release.name>
+                                <expansion.pack.release.version>${expansion.pack.release.version}</expansion.pack.release.version>
                             </task-properties>
                         </configuration>
                     </execution>
@@ -255,6 +257,18 @@
         <dependency>
             <groupId>org.eclipse.microprofile.openapi</groupId>
             <artifactId>microprofile-openapi-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eap-expansion-pack</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

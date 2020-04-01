@@ -29,6 +29,7 @@ import org.jboss.as.controller.OperationContext;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
+import org.jboss.eap.expansion.pack.ExpansionPackDependencyVerifier;
 import org.wildfly.extension.microprofile.faulttolerance.deployment.MicroProfileFaultToleranceDependenciesProcessor;
 import org.wildfly.extension.microprofile.faulttolerance.deployment.MicroProfileFaultToleranceDeploymentProcessor;
 
@@ -40,6 +41,7 @@ public class MicroProfileFaultToleranceServiceHandler implements ResourceService
     @Override
     public void installServices(OperationContext context, ModelNode model) {
         MicroProfileFaultToleranceLogger.ROOT_LOGGER.activatingSubsystem();
+        ExpansionPackDependencyVerifier.installVerifier(context.getServiceTarget());
     }
 
     @Override

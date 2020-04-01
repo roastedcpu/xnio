@@ -1,0 +1,3 @@
+# Galleon's feature-pack-build mojo wants to load this module before the expansion.pack package task runs that
+# copies in validation.properties. This results in the module failing to load because the 'dir' resource in
+# module.xml does not exist. So this placeholder file ensures it exists.
