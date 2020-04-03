@@ -58,6 +58,7 @@ import org.jboss.metadata.web.spec.FilterMetaData;
 import org.jboss.metadata.web.spec.FiltersMetaData;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleClassLoader;
+import org.wildfly.microprofile.opentracing.smallrye.TracingCDIExtension;
 
 public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
     private static final AttachmentKey<Tracer> ATTACHMENT_KEY = AttachmentKey.create(Tracer.class);
@@ -145,9 +146,9 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         DeploymentUnit deploymentUnit = deploymentPhaseContext.getDeploymentUnit();
         Tracer tracer = null;
         ClassLoader initialCl = WildFlySecurityManager.getCurrentContextClassLoaderPrivileged();
+        final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
+        final ModuleClassLoader moduleCL = module.getClassLoader();
         try {
-            final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-            final ModuleClassLoader moduleCL = module.getClassLoader();
             WildFlySecurityManager.setCurrentContextClassLoaderPrivileged(moduleCL);
             //Looking for GlobalTracer
             Class globalTracerClass = moduleCL.loadClass("io.opentracing.util.GlobalTracer");
@@ -174,6 +175,7 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
                 tracer = Configuration.fromEnv(serviceName).getTracerBuilder().withManualShutdown().build();
             }
         }
+        TracingCDIExtension.registerApplicationTracer(moduleCL, tracer);
         deploymentUnit.addToAttachmentList(ServletContextAttribute.ATTACHMENT_KEY, new ServletContextAttribute(SMALLRYE_OPENTRACING_SERVICE_NAME, serviceName));
         deploymentUnit.addToAttachmentList(ServletContextAttribute.ATTACHMENT_KEY, new ServletContextAttribute(SMALLRYE_OPENTRACING_TRACER, tracer));
         deploymentUnit.addToAttachmentList(ServletContextAttribute.ATTACHMENT_KEY, new ServletContextAttribute(SMALLRYE_OPENTRACING_TRACER_MANAGED, true));
