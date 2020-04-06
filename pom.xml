@@ -70,6 +70,7 @@
         <module>ee-galleon-pack</module>
         <module>ee-security</module>
         <module>ejb3</module>
+        <module>expansion-pack</module>
         <module>feature-pack</module>
         <module>galleon-pack</module>
         <module>iiop-openjdk</module>
@@ -143,6 +144,8 @@
         <servlet.dist.product.release.name>WildFly Servlet</servlet.dist.product.release.name>
         <servlet.dist.product.slot>wildfly-web</servlet.dist.product.slot>
         <servlet.dist.product.release.version>${ee.dist.product.release.version}</servlet.dist.product.release.version>
+        <expansion.pack.release.name>JBoss EAP XP</expansion.pack.release.name>
+        <expansion.pack.release.version>1.0.0.GA</expansion.pack.release.version>
         <jboss.eap.release.version>7.3</jboss.eap.release.version>
         <product.docs.server.version>18</product.docs.server.version>
         <!-- A short variant of product.release.version used in 'startsWith' tests done by dist verification logic -->
@@ -923,6 +926,12 @@
                         <artifactId>wildfly-clustering-spi</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>${full.maven.groupId}</groupId>
+                <artifactId>eap-expansion-pack</artifactId>
+                <version>${full.maven.version}</version>
             </dependency>
 
             <dependency>

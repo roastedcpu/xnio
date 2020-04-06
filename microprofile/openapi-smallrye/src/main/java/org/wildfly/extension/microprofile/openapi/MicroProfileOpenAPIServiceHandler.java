@@ -30,6 +30,7 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
+import org.jboss.eap.expansion.pack.ExpansionPackDependencyVerifier;
 import org.wildfly.extension.microprofile.openapi.deployment.OpenAPIDependencyProcessor;
 import org.wildfly.extension.microprofile.openapi.deployment.OpenAPIDocumentProcessor;
 import org.wildfly.extension.microprofile.openapi.logging.MicroProfileOpenAPILogger;
@@ -42,6 +43,7 @@ public class MicroProfileOpenAPIServiceHandler implements ResourceServiceHandler
     @Override
     public void installServices(OperationContext context, ModelNode model) throws OperationFailedException {
         MicroProfileOpenAPILogger.LOGGER.activatingSubsystem();
+        ExpansionPackDependencyVerifier.installVerifier(context.getServiceTarget());
     }
 
     @Override

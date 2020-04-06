@@ -5,5 +5,6 @@
         <package name="product.conf" optional="true"/>
         <package name="layers.conf" optional="true"/>
         <package name="misc.domain"/>
+        <package name="expansion.pack"/>
     </packages>
 </config>
