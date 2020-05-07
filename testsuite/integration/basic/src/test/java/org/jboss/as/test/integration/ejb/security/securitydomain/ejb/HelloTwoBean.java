@@ -11,8 +11,8 @@ import javax.ejb.Stateless;
 public class HelloTwoBean extends BaseHello implements Hello {
 
     public HelloTwoBean() {
-        // HelloTwoBean uses MyNonValidatingSecurityDomain which uses the loginmodule.custom.MyPrincipal
-        super("loginmodule.custom.MyPrincipal");
+        // HelloTwoBean uses MyNonValidatingSecurityDomain which uses the org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal
+        super("org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal");
     }
 
     @EJB(beanName="HelloOneBean")
