@@ -24,7 +24,7 @@ package org.wildfly.clustering.ejb.infinispan;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
@@ -92,7 +92,7 @@ public class InfinispanBeanManagerFactoryServiceConfiguratorFactory<I> implement
     }
 
     @Override
-    public Collection<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(final ServiceName name) {
+    public Iterable<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(final ServiceName name) {
         String cacheName = getCacheName(name, this.name);
         String containerName = this.config.getContainerName();
         String templateCacheName = this.config.getCacheName();
@@ -117,11 +117,10 @@ public class InfinispanBeanManagerFactoryServiceConfiguratorFactory<I> implement
             }
         };
 
-        List<CapabilityServiceConfigurator> builders = new ArrayList<>(3);
-        builders.add(new TemplateConfigurationServiceConfigurator(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CONFIGURATION.getName()).append(containerName, cacheName), containerName, cacheName, templateCacheName, configurator));
-        builders.add(new CacheServiceConfigurator<>(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CACHE.getName()).append(containerName, cacheName), containerName, cacheName).require(new ServiceDependency(name.append("marshalling"))));
-        builders.add(new ServiceConfiguratorAdapter(new RemoveOnCancelScheduledExecutorServiceConfigurator(name.append(this.name, "expiration"), EXPIRATION_THREAD_FACTORY)));
-        return builders;
+        CapabilityServiceConfigurator configurationConfigurator = new TemplateConfigurationServiceConfigurator(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CONFIGURATION.getName()).append(containerName, cacheName), containerName, cacheName, templateCacheName, configurator);
+        CapabilityServiceConfigurator cacheConfigurator = new CacheServiceConfigurator<>(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CACHE.getName()).append(containerName, cacheName), containerName, cacheName).require(new ServiceDependency(name.append("marshalling")));
+        CapabilityServiceConfigurator executorConfigurator = new ServiceConfiguratorAdapter(new RemoveOnCancelScheduledExecutorServiceConfigurator(name.append(this.name, "expiration"), EXPIRATION_THREAD_FACTORY));
+        return Arrays.asList(configurationConfigurator, cacheConfigurator, executorConfigurator);
     }
 
     @Override

@@ -24,7 +24,6 @@ package org.jboss.as.ejb3.cache.simple;
 import static java.security.AccessController.doPrivileged;
 
 import java.security.PrivilegedAction;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
@@ -81,7 +80,7 @@ public class SimpleCacheFactoryBuilderServiceConfigurator<K, V extends Identifia
     }
 
     @Override
-    public Collection<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(DeploymentUnit unit) {
+    public Iterable<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(DeploymentUnit unit) {
         ServiceConfigurator configurator = new RemoveOnCancelScheduledExecutorServiceConfigurator(this.getExpirationSchedulerServiceName(unit.getServiceName()), THREAD_FACTORY);
         return Collections.singleton(new ServiceConfiguratorAdapter(configurator));
     }
