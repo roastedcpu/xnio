@@ -135,7 +135,7 @@ public class SimpleCache<K, V extends Identifiable<K>> implements Cache<K, V> {
 
     @Override
     public V get(K key) {
-        Future<?> future = this.expirationFutures.get(key);
+        Future<?> future = this.expirationFutures.remove(key);
         if (future != null) {
             future.cancel(true);
         }
