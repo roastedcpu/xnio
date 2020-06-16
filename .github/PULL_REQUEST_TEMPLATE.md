@@ -1,5 +1,16 @@
 Thanks for submitting your Pull Request!
 
+Pull Request desciription must have at the least following content:
+
+Upstream Issue: <TICKET>|Upstream not required
+[Upstream PR: <PR>]
+Issue: <TICKET>
+[Related Issues: <TICKET>,<TICKET>,....]
+
+
+
+Also, it has to conform to following:
+
 Please make sure your PR meets the following requirements:
 - [ ] Pull Request title is properly formatted: `[WFLY-XYZ] Subject` or `WFLY-XYZ Subject`
 - [ ] Pull Request contains link to the JIRA issue(s)
@@ -17,4 +28,3 @@ For new features ensure as well:
 - [ ] Test Plan has been done
 - [ ] Tests were verified in advance
 
-If you are not an active contributor of the WildFly project you can request sponsorship by one of the members to help guide you through the process.
