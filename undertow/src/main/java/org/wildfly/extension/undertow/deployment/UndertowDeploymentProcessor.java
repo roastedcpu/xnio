@@ -482,7 +482,7 @@ public class UndertowDeploymentProcessor implements DeploymentUnitProcessor, Fun
 
 
         // adding JACC service
-        if(securityEnabled) {
+        //if(securityEnabled) {
             WarJACCDeployer deployer = new WarJACCDeployer();
             JaccService<WarMetaData> jaccService = deployer.deploy(deploymentUnit, jaccContextId);
             if (jaccService != null) {
@@ -498,7 +498,7 @@ public class UndertowDeploymentProcessor implements DeploymentUnitProcessor, Fun
                 jaccBuilder.requires(deploymentServiceName);
                 jaccBuilder.setInitialMode(Mode.PASSIVE).install();
             }
-        }
+        //}
 
         // Process the web related mgmt information
         final DeploymentResourceSupport deploymentResourceSupport = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_RESOURCE_SUPPORT);
