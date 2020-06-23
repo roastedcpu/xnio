@@ -152,8 +152,8 @@
         <copy-artifact artifact="org.jboss.seam.integration:jboss-seam-int-jbossas" to-location="modules/system/layers/base/org/jboss/integration/ext-content/main/bundled/jboss-seam-int-jbossas.jar"/>
         <copy-artifact artifact="org.jboss.eap:wildfly-client-all" to-location="bin/client/jboss-client.jar"/>
         <copy-artifact artifact="org.wildfly.core:wildfly-cli::client" to-location="bin/client/jboss-cli-client.jar"/>
-        <copy-artifact artifact="org.apache.activemq:libartemis-native-32:so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-i686/libartemis-native-32.so"/>
-        <copy-artifact artifact="org.apache.activemq:libartemis-native-64:so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-x86_64/libartemis-native-64.so"/>
+        <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-i686:so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-i686/libartemis-native-linux-i686.so"/>
+        <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-x86_64:so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-x86_64/libartemis-native-linux-x86_64.so"/>
         <copy-artifact artifact="com.sun.xml.messaging.saaj:saaj-impl:::${version.sun.saaj-impl-1.3}" to-location="modules/system/layers/base/com/sun/xml/messaging/saaj/main/"/>
     </copy-artifacts>
     <mkdirs>

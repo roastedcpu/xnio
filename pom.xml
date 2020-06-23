@@ -319,8 +319,8 @@
         <version.net.jcip>1.0.0.redhat-8</version.net.jcip>
         <version.net.shibboleth.utilities.java-support>7.3.0.redhat-00001</version.net.shibboleth.utilities.java-support>
         <version.org.apache.activemq.artemis>2.9.0.redhat-00010</version.org.apache.activemq.artemis>
-        <version.org.apache.activemq.artemis.native>1.0.0.00003-redhat-00001</version.org.apache.activemq.artemis.native>
-        <version.org.apache.activemq.libartemis.native>1.0.0_00003-redhat-1</version.org.apache.activemq.libartemis.native>
+        <version.org.apache.activemq.artemis.native>1.0.2.redhat-00001</version.org.apache.activemq.artemis.native>
+        <version.org.apache.activemq.libartemis.native>1.0.2-redhat-1</version.org.apache.activemq.libartemis.native>
         <version.org.apache.avro>1.7.6.redhat-2</version.org.apache.avro>
         <version.org.apache.cxf>3.3.5.redhat-00001</version.org.apache.cxf>
         <version.org.apache.cxf.xjcplugins>3.3.0.redhat-00001</version.org.apache.cxf.xjcplugins>
@@ -2297,7 +2297,7 @@
 
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>libartemis-native-32</artifactId>
+                <artifactId>libartemis-native-linux-i686</artifactId>
                 <type>so</type>
                 <version>${version.org.apache.activemq.libartemis.native}</version>
                 <exclusions>
@@ -2310,7 +2310,7 @@
 
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>libartemis-native-64</artifactId>
+                <artifactId>libartemis-native-linux-x86_64</artifactId>
                 <type>so</type>
                 <version>${version.org.apache.activemq.libartemis.native}</version>
                 <exclusions>

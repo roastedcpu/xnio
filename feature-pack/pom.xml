@@ -1858,7 +1858,7 @@
 
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>libartemis-native-32</artifactId>
+            <artifactId>libartemis-native-linux-i686</artifactId>
             <type>so</type>
             <exclusions>
                 <exclusion>
@@ -1870,7 +1870,7 @@
 
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>libartemis-native-64</artifactId>
+            <artifactId>libartemis-native-linux-x86_64</artifactId>
             <type>so</type>
             <exclusions>
                 <exclusion>
