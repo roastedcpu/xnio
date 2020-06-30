@@ -228,9 +228,11 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
 
     @Override
     public Affinity getWeakAffinity(I id) {
-        CacheMode mode = this.cache.getCacheConfiguration().clustering().cacheMode();
+        org.infinispan.configuration.cache.Configuration config = this.cache.getCacheConfiguration();
+        CacheMode mode = config.clustering().cacheMode();
         if (mode.isClustered()) {
-            Node node = mode.needsStateTransfer() && !mode.isScattered() ? this.locatePrimaryOwner(id) : this.registry.getGroup().getLocalMember();
+            // Invalidation caches map all keys to a single segment - thus should use local affinity
+            Node node = mode.needsStateTransfer() ? this.locatePrimaryOwner(id) : this.registry.getGroup().getLocalMember();
             Map.Entry<String, ?> entry = this.registry.getEntry(node);
             if (entry != null) {
                 return new NodeAffinity(entry.getKey());
