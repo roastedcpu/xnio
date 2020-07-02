@@ -99,6 +99,7 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
     final CacheProperties properties;
     final Cache<Key<String>, ?> cache;
     final org.wildfly.clustering.web.cache.session.Scheduler primaryOwnerScheduler;
+    final Runnable startTask;
 
     private final KeyAffinityServiceFactory affinityFactory;
     private final SessionFactory<CompositeSessionMetaDataEntry<L>, ?, L> factory;
@@ -125,9 +126,7 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
 
         DistributionManager dist = this.cache.getAdvancedCache().getDistributionManager();
         // If member owns any segments, schedule expiration for session we own
-        if ((dist == null) || !dist.getWriteConsistentHash().getPrimarySegmentsForOwner(this.cache.getCacheManager().getAddress()).isEmpty()) {
-            new ScheduleExpirationTask(this.cache, this.filter, this.expirationScheduler, new SimpleLocality(false), new CacheLocality(this.cache)).run();
-        }
+        this.startTask = (dist == null) || !dist.getWriteConsistentHash().getPrimarySegmentsForOwner(this.cache.getCacheManager().getAddress()).isEmpty() ? new ScheduleExpirationTask(this.cache, this.filter, this.expirationScheduler, new SimpleLocality(false), new CacheLocality(this.cache)) : null;
     }
 
     @Override
@@ -177,6 +176,11 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
             @Override
             public org.wildfly.clustering.web.cache.session.Scheduler getExpirationScheduler() {
                 return InfinispanSessionManagerFactory.this.primaryOwnerScheduler;
+            }
+
+            @Override
+            public Runnable getStartTask() {
+                return InfinispanSessionManagerFactory.this.startTask;
             }
         };
         return new InfinispanSessionManager<>(this.factory, config);
