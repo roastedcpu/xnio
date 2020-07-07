@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.ListAttributeDefinition;
+import org.jboss.as.controller.ObjectMapAttributeDefinition;
 import org.jboss.as.controller.ObjectTypeAttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -80,7 +81,10 @@ public abstract class AbstractEJBComponentResourceDefinition extends SimpleResou
             .setFlags(AttributeAccess.Flag.STORAGE_RUNTIME, AttributeAccess.Flag.COUNTER_METRIC)
             .build();
 
-    private static final AttributeDefinition METHODS = ObjectTypeAttributeDefinition.Builder.of("methods", EXECUTION_TIME, INVOCATIONS, WAIT_TIME)
+    private static final AttributeDefinition METHODS = ObjectMapAttributeDefinition.Builder.of(
+            "methods",
+            ObjectTypeAttributeDefinition.Builder.of("complex", EXECUTION_TIME, INVOCATIONS, WAIT_TIME)
+            .build())
             .setRequired(false)
             .setFlags(AttributeAccess.Flag.STORAGE_RUNTIME)
             .build();
