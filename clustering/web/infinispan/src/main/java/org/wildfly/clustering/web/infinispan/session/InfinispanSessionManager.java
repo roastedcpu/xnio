@@ -52,7 +52,6 @@ import org.wildfly.clustering.infinispan.spi.distribution.Key;
 import org.wildfly.clustering.infinispan.spi.distribution.Locality;
 import org.wildfly.clustering.web.IdentifierFactory;
 import org.wildfly.clustering.web.cache.session.ImmutableSessionActivationNotifier;
-import org.wildfly.clustering.web.cache.session.ImmutableSessionBindingNotifier;
 import org.wildfly.clustering.web.cache.session.Scheduler;
 import org.wildfly.clustering.web.cache.session.SessionFactory;
 import org.wildfly.clustering.web.cache.session.SimpleImmutableSession;
@@ -234,13 +233,10 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
         if (event.isPre()) {
             String id = event.getKey().getValue();
             InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s will be removed", id);
-            Map.Entry<MV, AV> value = this.factory.tryValue(id);
-            if (value != null) {
-                ImmutableSession session = this.factory.createImmutableSession(id, value);
-
-                new ImmutableSessionBindingNotifier(session, this.context).unbound();
-
-                if (this.recorder != null) {
+            if (this.recorder != null) {
+                Map.Entry<MV, AV> value = this.factory.tryValue(id);
+                if (value != null) {
+                    ImmutableSession session = this.factory.createImmutableSession(id, value);
                     this.recorder.record(session);
                 }
             }
