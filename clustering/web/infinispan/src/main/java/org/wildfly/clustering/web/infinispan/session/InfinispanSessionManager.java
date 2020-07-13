@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import javax.servlet.ServletContext;
 
 import org.infinispan.Cache;
+import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.context.Flag;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryActivated;
@@ -50,6 +51,7 @@ import org.wildfly.clustering.infinispan.spi.PredicateKeyFilter;
 import org.wildfly.clustering.infinispan.spi.distribution.CacheLocality;
 import org.wildfly.clustering.infinispan.spi.distribution.Key;
 import org.wildfly.clustering.infinispan.spi.distribution.Locality;
+import org.wildfly.clustering.infinispan.spi.distribution.SimpleLocality;
 import org.wildfly.clustering.web.IdentifierFactory;
 import org.wildfly.clustering.web.cache.session.ImmutableSessionActivationNotifier;
 import org.wildfly.clustering.web.cache.session.Scheduler;
@@ -197,7 +199,8 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
     }
 
     private Set<String> getSessions(Flag... flags) {
-        Locality locality = new CacheLocality(this.cache);
+        CacheMode mode = this.cache.getCacheConfiguration().clustering().cacheMode();
+        Locality locality = (mode.isInvalidation() && !this.properties.isTransactional()) ? new SimpleLocality(true) : new CacheLocality(this.cache);
         try (Stream<Key<String>> keys = this.cache.getAdvancedCache().withFlags(flags).keySet().stream()) {
             return keys.filter(this.filter.and(key -> locality.isLocal(key))).map(key -> key.getValue()).collect(Collectors.toSet());
         }
