@@ -67,7 +67,7 @@ import org.wildfly.clustering.web.session.SessionManager;
  * Generic session manager implementation - independent of cache mapping strategy.
  * @author Paul Ferraro
  */
-@Listener(primaryOnly = true)
+@Listener
 public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, TransactionBatch> {
 
     private final Registrar<SessionExpirationListener> expirationRegistrar;
@@ -205,7 +205,7 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
 
     @CacheEntryActivated
     public void activated(CacheEntryActivatedEvent<SessionCreationMetaDataKey, ?> event) {
-        if (!event.isPre() && !this.properties.isPersistent()) {
+        if (!event.isPre() && !this.properties.isPersistent() && event.isOriginLocal()) {
             String id = event.getKey().getValue();
             InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s was activated", id);
             Map.Entry<MV, AV> value = this.factory.tryValue(id);
@@ -218,7 +218,7 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
 
     @CacheEntryPassivated
     public void passivated(CacheEntryPassivatedEvent<SessionCreationMetaDataKey, ?> event) {
-        if (event.isPre() && !this.properties.isPersistent()) {
+        if (event.isPre() && !this.properties.isPersistent() && event.isOriginLocal()) {
             String id = event.getKey().getValue();
             InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s will be passivated", id);
             Map.Entry<MV, AV> value = this.factory.tryValue(id);
@@ -231,7 +231,7 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
 
     @CacheEntryRemoved
     public void removed(CacheEntryRemovedEvent<SessionCreationMetaDataKey, ?> event) {
-        if (event.isPre()) {
+        if (event.isPre() && event.isOriginLocal()) {
             String id = event.getKey().getValue();
             InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s will be removed", id);
             Map.Entry<MV, AV> value = this.factory.tryValue(id);
