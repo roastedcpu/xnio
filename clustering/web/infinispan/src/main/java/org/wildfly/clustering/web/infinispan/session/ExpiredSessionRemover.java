@@ -64,6 +64,9 @@ public class ExpiredSessionRemover<MV, AV, L> implements Remover<String>, Regist
                 }
                 return this.factory.remove(id);
             }
+            InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s is not yet expired.", id);
+        } else {
+            InfinispanWebLogger.ROOT_LOGGER.tracef("Session %s was not found or is currently in use.", id);
         }
         return false;
     }

@@ -81,6 +81,7 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
     private final Predicate<Object> filter = new SessionCreationMetaDataKeyFilter();
     private final Recordable<ImmutableSession> recorder;
     private final ServletContext context;
+    private final Runnable startTask;
 
     private volatile Duration defaultMaxInactiveInterval = Duration.ofMinutes(30L);
     private volatile Registration expirationRegistration;
@@ -96,6 +97,7 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
         this.expirationScheduler = configuration.getExpirationScheduler();
         this.recorder = configuration.getInactiveSessionRecorder();
         this.context = configuration.getServletContext();
+        this.startTask = configuration.getStartTask();
     }
 
     @Override
@@ -109,6 +111,10 @@ public class InfinispanSessionManager<MV, AV, L> implements SessionManager<L, Tr
         this.cache.addListener(this, filter, null);
         this.cache.addListener(this.factory.getMetaDataFactory(), filter, null);
         this.cache.addListener(this.factory.getAttributesFactory(), filter, null);
+        // Run start task once all listeners are registered
+        if (this.startTask != null) {
+            this.startTask.run();
+        }
     }
 
     @Override
