@@ -55,7 +55,9 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.jboss.as.test.integration.management.ManagementOperations;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.controller.PathAddress;
 /**
  * @author John Bailey, Ondrej Chaloupka
  */
@@ -263,5 +265,16 @@ public class RemoteNamingEjbTestCase {
             ctx.close();
             Thread.currentThread().setContextClassLoader(current);
         }
+    }
+
+    @Test
+    public void testValue() throws Exception {
+        ModelNode operation = Util.createEmptyOperation("jndi-view", PathAddress.pathAddress("subsystem", "naming"));
+        ModelNode res = ManagementOperations.executeOperation(managementClient.getControllerClient(), operation);
+        ModelNode node = res.get("java: contexts", "java:jboss/exported", "test", "children",
+                "Bean!org.jboss.as.test.integration.naming.remote.ejb.Remote", "class-name");
+
+        Assert.assertEquals("org.jboss.as.test.integration.naming.remote.ejb.Remote", node.asString());
+
     }
 }
