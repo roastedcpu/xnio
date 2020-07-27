@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2011, Red Hat, Inc., and individual contributors
+ * Copyright 2020, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -19,7 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.integration.ejb.security;
+
+package org.jboss.as.test.integration.ejb.security.securitydomain;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.COMPOSITE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MODULE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.STEPS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
+import static org.jboss.as.security.Constants.AUTHENTICATION;
+import static org.jboss.as.security.Constants.CODE;
+import static org.jboss.as.security.Constants.FLAG;
+import static org.jboss.as.security.Constants.SECURITY_DOMAIN;
+import static org.jboss.as.test.integration.management.util.ServerReload.reloadIfRequired;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -28,41 +53,29 @@ import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.cli.CommandContext;
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.client.ModelControllerClient;
+import org.jboss.as.controller.client.helpers.Operations;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.security.Constants;
+import org.jboss.as.test.integration.ejb.security.securitydomain.ejb.Hello;
+import org.jboss.as.test.integration.ejb.security.securitydomain.ejb.Info;
+import org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal;
+import org.jboss.as.test.integration.ejb.security.securitydomain.module.NonValidatingLoginModule;
+import org.jboss.as.test.integration.management.util.CLITestUtil;
+import org.jboss.as.test.module.util.TestModule;
+import org.jboss.as.test.shared.SnapshotRestoreSetupTask;
+import org.jboss.as.test.shared.util.AssumeTestGroupUtil;
 import org.jboss.dmr.ModelNode;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.io.File;
-import java.io.IOException;
-
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Properties;
-import java.util.List;
-import java.util.logging.Logger;
-
-import org.jboss.as.test.integration.ejb.security.securitydomain.ejb.Hello;
-import org.jboss.as.test.integration.ejb.security.securitydomain.ejb.Info;
-import org.jboss.as.test.integration.management.util.CLITestUtil;
-import org.jboss.as.test.integration.management.util.MgmtOperationException;
-import org.jboss.as.test.integration.management.util.ServerReload;
-import org.jboss.as.test.shared.ServerSnapshot;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 
 /**
  * @author Francesco Marchioni
@@ -71,8 +84,7 @@ import org.junit.runner.RunWith;
  */
 
 @RunWith(Arquillian.class)
-@FixMethodOrder(MethodSorters.DEFAULT)
-@ServerSetup(EJBContextMultipleSDTestCase.EJBContextMultipleSDTestCaseServerSetup.class)
+@ServerSetup({SnapshotRestoreSetupTask.class, EJBContextMultipleSDTestCase.EJBContextMultipleSDTestCaseServerSetup.class})
 public class EJBContextMultipleSDTestCase {
 
     private static final String ARCHIVE_NAME = "EJBContextMultipleSDTestCase";
@@ -107,124 +119,152 @@ public class EJBContextMultipleSDTestCase {
         return context;
     }
 
-    @Test
-    public void firstTest() throws Exception {
+    @BeforeClass
+    public static void beforeClass() {
+        AssumeTestGroupUtil.assumeElytronProfileEnabled(); // PicketBox specific scenario, Elytron testing not required.
+    }
 
+    @Test
+    public void testSequentialInvocations() throws Exception {
         Context context = getInitialContext();
+
         Info info = new Info("Test1: client -> ejb1 (MySecurityDomain/SimplePrincipal) -> ejb2 (MyNonValidatingSecurityDomain/MyPrincipal)");
         Hello hello = (Hello) context.lookup(Hello.HelloOne);
         List<String> list = hello.sayHelloSeveralTimes(info);
 
-        Assert.assertEquals("hello", "hello");
         Assert.assertEquals(list.get(0), "Correct: org.jboss.security.SimplePrincipal == org.jboss.security.SimplePrincipal");
-        Assert.assertEquals(list.get(1), "Correct: loginmodule.custom.MyPrincipal == loginmodule.custom.MyPrincipal");
+        Assert.assertEquals(list.get(1), "Correct: org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal == org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal");
         Assert.assertEquals(list.get(2), "Correct: org.jboss.security.SimplePrincipal == org.jboss.security.SimplePrincipal");
-    }
 
-    @Test
-    public void secondTest() throws Exception {
+        info = new Info("Test2: client -> ejb2 (MyNonValidatingSecurityDomain/MyPrincipal) -> ejb1 (MySecurityDomain/SimplePrincipal)");
+        hello = (Hello) context.lookup(Hello.HelloTwo);
+        list = hello.sayHelloSeveralTimes(info);
 
-        Context context = getInitialContext();
-        Info info = new Info("Test2: client -> ejb2 (MyNonValidatingSecurityDomain/MyPrincipal) -> ejb1 (MySecurityDomain/SimplePrincipal)");
-        Hello hello = (Hello) context.lookup(Hello.HelloTwo);
-        List<String> list = hello.sayHelloSeveralTimes(info);
-
-        Assert.assertEquals(list.get(0), "Correct: loginmodule.custom.MyPrincipal == loginmodule.custom.MyPrincipal");
+        Assert.assertEquals(list.get(0), "Correct: org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal == org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal");
         Assert.assertEquals(list.get(1), "Correct: org.jboss.security.SimplePrincipal == org.jboss.security.SimplePrincipal");
-        Assert.assertEquals(list.get(2), "Correct: loginmodule.custom.MyPrincipal == loginmodule.custom.MyPrincipal");
+        Assert.assertEquals(list.get(2), "Correct: org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal == org.jboss.as.test.integration.ejb.security.securitydomain.module.MyPrincipal");
     }
 
     static class EJBContextMultipleSDTestCaseServerSetup implements ServerSetupTask {
-        private AutoCloseable snapshot;
         protected Logger log = Logger.getLogger(this.getClass().getSimpleName());
-        private ModelControllerClient modelControllerClient;
 
-        public static String executeCommand(CommandContext ctx, ModelNode modelNode) {
+        Path loginModuleJar;
+        TestModule module;
 
-            ModelControllerClient client = ctx.getModelControllerClient();
-            if (client != null) {
-                try {
-                    ModelNode response = client.execute(modelNode);
-                    return (response.toJSONString(true));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                throw new RuntimeException("Connection Error! The ModelControllerClient is not available.");
+        Path createJar(String namePrefix, Class<?>... classes) throws IOException {
+            Path testJar = Files.createTempFile(namePrefix, ".jar");
+            JavaArchive jar = ShrinkWrap.create(JavaArchive.class).addClasses(classes);
+            jar.as(ZipExporter.class).exportTo(testJar.toFile(), true);
+            return testJar;
+        }
+
+        void deployModule() throws Exception {
+            module = new TestModule("loginmodule.custom", "org.picketbox", "javax.api");
+            JavaArchive jar = module.addResource("loginmodule.custom.jar");
+            jar.addClasses(MyPrincipal.class, NonValidatingLoginModule.class);
+            module.create(true);
+        }
+
+        void undeployModule() throws Exception {
+            if (module != null) {
+                module.remove();
             }
-            return null;
+        }
+
+        ModelNode createConfigurationOperation() {
+            final ModelNode compositeOp = new ModelNode();
+            compositeOp.get(OP).set(COMPOSITE);
+            compositeOp.get(OP_ADDR).setEmptyList();
+            ModelNode updates = compositeOp.get(STEPS);
+
+            PathAddress securityDomainAddress = PathAddress.pathAddress()
+                    .append(SUBSYSTEM, "security")
+                    .append(SECURITY_DOMAIN, "MySecurityDomain");
+            updates.add(Util.createAddOperation(securityDomainAddress));
+
+            PathAddress authAddress = securityDomainAddress.append(AUTHENTICATION, Constants.CLASSIC);
+            updates.add(Util.createAddOperation(authAddress));
+
+            ModelNode addModule = Util.createAddOperation(authAddress.append(Constants.LOGIN_MODULE, "Remoting"));
+            addModule.get(CODE).set("Remoting");
+            addModule.get(FLAG).set("optional");
+            addModule.get(Constants.MODULE_OPTIONS).add("password-stacking", "useFirstPass");
+            updates.add(addModule);
+
+            addModule = Util.createAddOperation(authAddress.append(Constants.LOGIN_MODULE, "UsersRoles"));
+            addModule.get(CODE).set("UsersRoles");
+            addModule.get(FLAG).set("required");
+            addModule.get(Constants.MODULE_OPTIONS).add("password-stacking", "useFirstPass");
+            addModule.get(Constants.MODULE_OPTIONS).add("usersProperties", getUsersFile());
+            addModule.get(Constants.MODULE_OPTIONS).add("rolesProperties", getGroupsFile());
+            updates.add(addModule);
+
+            securityDomainAddress = PathAddress.pathAddress()
+                    .append(SUBSYSTEM, "security")
+                    .append(SECURITY_DOMAIN, "MyNonValidatingDomain");
+            updates.add(Util.createAddOperation(securityDomainAddress));
+
+            authAddress = securityDomainAddress.append(AUTHENTICATION, Constants.CLASSIC);
+            updates.add(Util.createAddOperation(authAddress));
+
+            addModule = Util.createAddOperation(authAddress.append(Constants.LOGIN_MODULE, "Custom"));
+            addModule.get(CODE).set(NonValidatingLoginModule.class.getName());
+            addModule.get(MODULE).set("loginmodule.custom");
+            addModule.get(FLAG).set("required");
+            addModule.get(Constants.MODULE_OPTIONS).add("password-stacking", "useFirstPass");
+            updates.add(addModule);
+
+            PathAddress realmAddress = PathAddress.pathAddress(PathElement.pathElement("core-service", "management"),
+                    PathElement.pathElement("security-realm", "MyRealm"));
+            ModelNode addRealm = Util.createAddOperation(realmAddress);
+            addRealm.get("map-group-to-roles").set("true");
+            updates.add(addRealm);
+
+            ModelNode addAuthentication = Util.createAddOperation(realmAddress.append("authentication", "jaas"));
+            addAuthentication.get("name").set("MySecurityDomain");
+            updates.add(addAuthentication);
+
+            PathAddress httpConnectorAddress = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, "remoting"),
+                    PathElement.pathElement("http-connector", "http-remoting-connector"));
+            updates.add(Util.getWriteAttributeOperation(httpConnectorAddress, "security-realm", "MyRealm"));
+
+            return compositeOp;
+        }
+
+        void execute(final ModelControllerClient client, final ModelNode operation) throws IOException {
+            final ModelNode result = client.execute(operation);
+            if (!Operations.isSuccessfulOutcome(result)) {
+                Assert.fail(Operations.getFailureDescription(result).toString());
+            }
+            Operations.readResult(result);
         }
 
         @Override
         public void setup(final ManagementClient managementClient, final String containerId) throws Exception {
-            snapshot = ServerSnapshot.takeSnapshot(managementClient);
-            log.info("Installing modules and Security Manager");
-            try {
+            log.info("Installing modules and Security Domains");
 
-                CommandContext ctx = CLITestUtil.getCommandContext();
-                ctx.connectController();
-                ModelNode cliCommand = null;
-                File fileCLI = null;
-                File fileModule = null;
+            deployModule();
 
-                // Install module and SecurityManager
-                URL urlCLI = getClass().getResource("securitydomain/cli/JBEAP-17862.deploy.cli");
-                fileCLI = new File(urlCLI.toURI());
+            CommandContext ctx = CLITestUtil.getCommandContext();
+            ctx.connectController();
+            ModelControllerClient modelControllerClient = ctx.getModelControllerClient();
 
-                String request1 = "run-batch --file=" + fileCLI.getAbsolutePath();
-                cliCommand = ctx.buildRequest(request1);
-                String output = executeCommand(ctx, cliCommand);
+            execute(modelControllerClient, createConfigurationOperation());
+            reloadIfRequired(modelControllerClient);
 
-                log.info(output);
-                ServerReload.executeReloadAndWaitForCompletion(managementClient.getControllerClient());
-                // Gather info in order to write the application-users.properties
-                String strServerProperties = "/core-service=platform-mbean/type=runtime:read-attribute(name=system-properties)";
-                cliCommand = ctx.buildRequest(strServerProperties);
-                output = executeCommand(ctx, cliCommand);
-
-                String configFolder = output.replaceAll("^.*jboss.server.config.dir\" : \"", "").replaceAll("\".*", "");
-
-                if (!new File(configFolder).exists()) {
-                    throw new RuntimeException("Unable to find the jboss.server.config.dir :" + configFolder);
-                }
-                String usersProperties = configFolder + File.separator + "application-users.properties";
-
-                Files.write(Paths.get(usersProperties), "\nADMIN=55372d397fd6f1dc0ee6ff989d0c93ec".getBytes(), StandardOpenOption.APPEND);
-
-            } catch (Exception e) {
-
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                String exceptionAsString = sw.toString();
-                log.info(exceptionAsString);
-
-            }
         }
 
         @Override
         public void tearDown(final ManagementClient managementClient, final String containerId) throws Exception {
-            try {
-                log.info("Shutdown in progress");
-                File fileCLI = null;
-                CommandContext ctx = CLITestUtil.getCommandContext();
-                ctx.connectController();
-                ModelNode cliCommand = null;
-
-                URL urlCLI = getClass().getResource("securitydomain/cli/JBEAP-17862.undeploy.cli");
-                fileCLI = new File(urlCLI.toURI());
-                String request1 = "run-batch --file=" + fileCLI.getAbsolutePath();
-                cliCommand = ctx.buildRequest(request1);
-                String output = executeCommand(ctx, cliCommand);
-                log.info(output);
-            } finally {
-                snapshot.close();
-            }
+            undeployModule();
         }
 
-        private void removeContentItem(final ManagementClient managementClient, final String overlayName, final String content) throws IOException, MgmtOperationException {
+        String getUsersFile() {
+            return new File(EJBContextMultipleSDTestCase.class.getResource("users.properties").getFile()).getAbsolutePath();
         }
 
-        private void removeDeploymentItem(final ManagementClient managementClient, final String overlayName, final String deploymentRuntimeName) throws IOException, MgmtOperationException {
+        String getGroupsFile() {
+            return new File(EJBContextMultipleSDTestCase.class.getResource("roles.properties").getFile()).getAbsolutePath();
         }
     }
 }
