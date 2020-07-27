@@ -2083,25 +2083,56 @@
                                     <model>standalone</model>
                                     <name>standalone.xml</name>
                                     <layers>
+                                        <layer>application-security-realm</layer>
+                                        <layer>base-server</layer>
                                         <layer>bean-validation</layer>
                                         <layer>cdi</layer>
                                         <layer>cloud-profile</layer>
+                                        <layer>cloud-server</layer>
+                                        <layer>core-management</layer>
+                                        <layer>core-security-realms</layer>
+                                        <layer>core-server</layer>
+                                        <layer>core-tools</layer>
                                         <layer>datasources</layer>
-                                        <layer>h2-driver</layer>
-                                        <layer>h2-datasource</layer>
-                                        <layer>h2-default-datasource</layer>
+                                        <layer>datasources-web-server</layer>
+                                        <layer>deployment-scanner</layer>
+                                        <layer>discovery</layer>
                                         <layer>ee</layer>
                                         <layer>ee-security</layer>
+                                        <layer>elytron</layer>
+                                        <layer>h2-datasource</layer>
+                                        <layer>h2-default-datasource</layer>
+                                        <layer>h2-driver</layer>
+                                        <layer>io</layer>
                                         <layer>jaxrs</layer>
+                                        <layer>jaxrs-server</layer>
                                         <layer>jms-activemq</layer>
+                                        <layer>jmx</layer>
+                                        <layer>jmx-remoting</layer>
                                         <layer>jpa</layer>
+                                        <layer>legacy-management</layer>
+                                        <layer>legacy-security</layer>
+                                        <layer>logging</layer>
+                                        <layer>management</layer>
+                                        <layer>management-security-realm</layer>
+                                        <layer>microprofile-config</layer>
+                                        <layer>microprofile-fault-tolerance</layer>
+                                        <layer>microprofile-jwt</layer>
+                                        <layer>microprofile-metrics</layer>
+                                        <layer>microprofile-openapi</layer>
+                                        <layer>naming</layer>
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
                                         <layer>resource-adapters</layer>
+                                        <layer>secure-management</layer>
+                                        <layer>security-manager</layer>
                                         <layer>transactions</layer>
                                         <layer>undertow</layer>
                                         <layer>undertow-legacy-https</layer>
+                                        <layer>undertow-load-balancer</layer>
                                         <layer>vault</layer>
+                                        <layer>web-clustering</layer>
+                                        <layer>web-server</layer>
                                     </layers>
                                 </config>
                             </configurations>
@@ -2139,25 +2170,56 @@
                                     <model>standalone</model>
                                     <name>standalone.xml</name>
                                     <layers>
+                                        <layer>application-security-realm</layer>
+                                        <layer>base-server</layer>
                                         <layer>bean-validation</layer>
                                         <layer>cdi</layer>
                                         <layer>cloud-profile</layer>
+                                        <layer>cloud-server</layer>
+                                        <layer>core-management</layer>
+                                        <layer>core-security-realms</layer>
+                                        <layer>core-server</layer>
+                                        <layer>core-tools</layer>
                                         <layer>datasources</layer>
-                                        <layer>h2-driver</layer>
-                                        <layer>h2-datasource</layer>
-                                        <layer>h2-default-datasource</layer>
+                                        <layer>datasources-web-server</layer>
+                                        <layer>deployment-scanner</layer>
+                                        <layer>discovery</layer>
                                         <layer>ee</layer>
                                         <layer>ee-security</layer>
+                                        <layer>elytron</layer>
+                                        <layer>h2-datasource</layer>
+                                        <layer>h2-default-datasource</layer>
+                                        <layer>h2-driver</layer>
+                                        <layer>io</layer>
                                         <layer>jaxrs</layer>
+                                        <layer>jaxrs-server</layer>
                                         <layer>jms-activemq</layer>
+                                        <layer>jmx</layer>
+                                        <layer>jmx-remoting</layer>
                                         <layer>jpa-distributed</layer>
+                                        <layer>legacy-management</layer>
+                                        <layer>legacy-security</layer>
+                                        <layer>logging</layer>
+                                        <layer>management</layer>
+                                        <layer>management-security-realm</layer>
+                                        <layer>microprofile-config</layer>
+                                        <layer>microprofile-fault-tolerance</layer>
+                                        <layer>microprofile-jwt</layer>
+                                        <layer>microprofile-metrics</layer>
+                                        <layer>microprofile-openapi</layer>
+                                        <layer>naming</layer>
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
                                         <layer>resource-adapters</layer>
+                                        <layer>secure-management</layer>
+                                        <layer>security-manager</layer>
                                         <layer>transactions</layer>
                                         <layer>undertow</layer>
                                         <layer>undertow-legacy-https</layer>
+                                        <layer>undertow-load-balancer</layer>
                                         <layer>vault</layer>
+                                        <layer>web-clustering</layer>
+                                        <layer>web-server</layer>
                                     </layers>
                                     <excluded-layers>
                                         <layer>jpa</layer>
