@@ -3219,4 +3219,8 @@ public interface EjbLogger extends BasicLogger {
 
     @Message(id = 519, value = "Invalid unmarshalling filter specfication %s; specifications must describe class or package name matching patterns")
     IllegalArgumentException invalidFilterSpec(String spec);
+
+    // use message id 521 to keep consistence with upstream
+    @Message(id = 521, value = "Some classes referenced by annotation: %s in class: %s are missing.")
+    DeploymentUnitProcessingException missingClassInAnnotation(String anCls, String resCls);
 }
