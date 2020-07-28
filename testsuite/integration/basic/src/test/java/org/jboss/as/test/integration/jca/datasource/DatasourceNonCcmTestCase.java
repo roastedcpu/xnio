@@ -153,7 +153,7 @@ public class DatasourceNonCcmTestCase extends JcaMgmtBase {
                     "org.jboss.staxmapper,  " +
                     "org.jboss.ironjacamar.impl, " +
                     "org.jboss.ironjacamar.jdbcadapters, " +
-                    "org.jboss.remoting3\n"
+                    "org.jboss.remoting\n"
         ), "MANIFEST.MF");
 
         jar.addAsManifestResource(createPermissionsXmlAsset(
