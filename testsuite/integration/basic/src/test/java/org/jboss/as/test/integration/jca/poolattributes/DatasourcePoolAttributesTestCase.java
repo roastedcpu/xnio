@@ -108,7 +108,7 @@ public class DatasourcePoolAttributesTestCase extends JcaMgmtBase {
                 "org.jboss.as.controller," +
                 "org.jboss.dmr," +
                 "org.jboss.as.cli," +
-                "org.jboss.remoting3," +
+                "org.jboss.remoting," +
                 "org.jboss.staxmapper," +
                 "org.jboss.ironjacamar.api," +
                 "org.jboss.ironjacamar.impl," +

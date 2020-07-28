@@ -74,7 +74,7 @@ public class ServerInterceptorsTestCase {
         JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "test-server-interceptor.jar");
         jar.addPackage(AbstractServerInterceptorsSetupTask.class.getPackage());
         jar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client," +
-                "org.jboss.dmr," + "org.jboss.remoting3\n"), "MANIFEST.MF");
+                "org.jboss.dmr," + "org.jboss.remoting\n"), "MANIFEST.MF");
         jar.addAsManifestResource(createPermissionsXmlAsset(
                 new RemotingPermission("connect"),
                 new RemotingPermission("createEndpoint"),
