@@ -88,7 +88,7 @@ public class InfinispanCacheDeploymentListener implements EventListener {
             // If using a private cache, addCacheDependencies(...) is never triggered
             String[] caches = properties.getProperty(CACHES).split("\\s+");
             for (String cache : caches) {
-                ServiceName dependencyName = ServiceName.parse(InfinispanCacheRequirement.CONFIGURATION.resolve(container, cache));
+                ServiceName dependencyName = ServiceName.parse(InfinispanCacheRequirement.CONFIGURATION.getName()).append(container, cache);
                 builder.requires(dependencyName);
             }
         }
