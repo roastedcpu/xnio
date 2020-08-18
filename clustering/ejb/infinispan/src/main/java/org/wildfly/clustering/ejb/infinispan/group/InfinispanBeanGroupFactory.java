@@ -23,12 +23,13 @@ package org.wildfly.clustering.ejb.infinispan.group;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.infinispan.Cache;
 import org.infinispan.context.Flag;
@@ -72,7 +73,6 @@ public class InfinispanBeanGroupFactory<I, T> implements BeanGroupFactory<I, T> 
     private final Predicate<Map.Entry<? super BeanKey<I>, ? super BeanEntry<I>>> beanFilter;
     private final MarshalledValueFactory<MarshallingContext> factory;
     private final MarshallingContext context;
-    private final AtomicInteger passiveCount = new AtomicInteger();
     private final PassivationListener<T> passivationListener;
     private final MutatorFactory<BeanGroupKey<I>, BeanGroupEntry<I, T>> mutatorFactory;
 
@@ -95,7 +95,14 @@ public class InfinispanBeanGroupFactory<I, T> implements BeanGroupFactory<I, T> 
 
     @Override
     public int getPassiveCount() {
-        return this.passiveCount.get();
+        return this.cache.getCacheConfiguration().persistence().passivation() ? this.count(EnumSet.noneOf(Flag.class)) - this.count(EnumSet.of(Flag.SKIP_CACHE_LOAD)) : 0;
+    }
+
+    private int count(Set<Flag> flags) {
+        Cache<BeanKey<I>, BeanEntry<I>> cache = flags.isEmpty() ? this.beanCache : this.beanCache.getAdvancedCache().withFlags(flags);
+        try (Stream<?> keys = cache.keySet().stream()) {
+            return (int) keys.filter(InfinispanBeanKey.class::isInstance).count();
+        }
     }
 
     @Override
@@ -159,7 +166,6 @@ public class InfinispanBeanGroupFactory<I, T> implements BeanGroupFactory<I, T> 
                             this.beanCache.evict(beanKey);
                         }
                     }
-                    this.passiveCount.addAndGet(notified.size());
                 } catch (RuntimeException | Error e) {
                     // Restore state of pre-passivated beans
                     for (I beanId : notified) {
@@ -186,7 +192,6 @@ public class InfinispanBeanGroupFactory<I, T> implements BeanGroupFactory<I, T> 
                     BeanEntry<I> beanEntry = this.beanCache.get(beanKey);
                     if ((beanEntry != null) && this.beanFilter.test(new AbstractMap.SimpleImmutableEntry<>(beanKey, beanEntry))) {
                         InfinispanEjbLogger.ROOT_LOGGER.tracef("Activating bean %s", beanKey);
-                        this.passiveCount.decrementAndGet();
                         try {
                             group.postActivate(beanId, this.passivationListener);
                         } catch (RuntimeException | Error e) {
