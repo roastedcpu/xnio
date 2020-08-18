@@ -153,6 +153,7 @@ public class InfinispanBeanGroupTestCase {
     @Test
     public void removeBean() throws ClassNotFoundException, IOException {
         MarshalledValue<Map<String, Object>, MarshallingContext> value = mock(MarshalledValue.class);
+        PassivationListener<Object> listener = mock(PassivationListener.class);
         Map<String, Object> beans = mock(Map.class);
         String id = "id";
         Object bean = new Object();
@@ -161,9 +162,11 @@ public class InfinispanBeanGroupTestCase {
         when(value.get(this.context)).thenReturn(beans);
         when(beans.remove(id)).thenReturn(bean);
 
-        Object result = this.group.removeBean(id);
+        Object result = this.group.removeBean(id, listener);
 
         Assert.assertSame(bean, result);
+
+        verify(listener).postActivate(bean);
     }
 
     @Test
