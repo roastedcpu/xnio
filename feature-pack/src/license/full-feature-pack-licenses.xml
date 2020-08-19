@@ -966,7 +966,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>libartemis-native-32</artifactId>
+      <artifactId>libartemis-native-linux-i686</artifactId>
       <licenses>
         <license>
           <name>Apache License 2.0</name>
@@ -977,7 +977,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>libartemis-native-64</artifactId>
+      <artifactId>libartemis-native-linux-x86_64</artifactId>
       <licenses>
         <license>
           <name>Apache License 2.0</name>
