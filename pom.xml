@@ -1181,7 +1181,13 @@
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>            
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-security-plugins</artifactId>
+                <version>${ee.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-servlet-dist</artifactId>
                 <version>${ee.maven.version}</version>
                 <type>pom</type>
