@@ -40,12 +40,12 @@ import org.wildfly.clustering.ejb.PassivationListener;
 import org.wildfly.clustering.ejb.RemoveListener;
 import org.wildfly.clustering.ejb.infinispan.bean.InfinispanBeanFactory;
 import org.wildfly.clustering.ejb.infinispan.group.InfinispanBeanGroupFactory;
+import org.wildfly.clustering.group.Group;
 import org.wildfly.clustering.infinispan.spi.affinity.KeyAffinityServiceFactory;
 import org.wildfly.clustering.marshalling.jboss.MarshallingContext;
 import org.wildfly.clustering.marshalling.jboss.SimpleMarshalledValueFactory;
 import org.wildfly.clustering.marshalling.jboss.SimpleMarshallingContextFactory;
 import org.wildfly.clustering.marshalling.spi.MarshalledValueFactory;
-import org.wildfly.clustering.registry.Registry;
 import org.wildfly.clustering.spi.NodeFactory;
 
 /**
@@ -89,8 +89,8 @@ public class InfinispanBeanManagerFactory<I, T> implements BeanManagerFactory<I,
         Configuration<BeanGroupKey<I>, BeanGroupEntry<I, T>, BeanGroupFactory<I, T>> groupConfiguration = new SimpleConfiguration<>(groupCache, groupFactory);
         BeanFactory<I, T> beanFactory = new InfinispanBeanFactory<>(beanName, groupFactory, beanCache, properties, this.configuration.getBeanContext().getTimeout(), properties.isPersistent() ? passivationListener : null);
         Configuration<BeanKey<I>, BeanEntry<I>, BeanFactory<I, T>> beanConfiguration = new SimpleConfiguration<>(beanCache, beanFactory);
-        NodeFactory<Address> nodeFactory = this.configuration.getNodeFactory();
-        Registry<String, ?> registry = this.configuration.getRegistry();
+        Group group = this.configuration.getGroup();
+        NodeFactory<Address> memberFactory = this.configuration.getMemberFactory();
         KeyAffinityServiceFactory affinityFactory = this.configuration.getKeyAffinityServiceFactory();
         CommandDispatcherFactory dispatcherFactory = this.configuration.getCommandDispatcherFactory();
         Duration timeout = this.configuration.getBeanContext().getTimeout();
@@ -129,13 +129,13 @@ public class InfinispanBeanManagerFactory<I, T> implements BeanManagerFactory<I,
             }
 
             @Override
-            public Registry<String, ?> getRegistry() {
-                return registry;
+            public Group getGroup() {
+                return group;
             }
 
             @Override
-            public NodeFactory<Address> getNodeFactory() {
-                return nodeFactory;
+            public NodeFactory<Address> getMemberFactory() {
+                return memberFactory;
             }
 
             @Override

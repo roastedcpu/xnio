@@ -40,11 +40,11 @@ import org.wildfly.clustering.ejb.BeanContext;
 import org.wildfly.clustering.ejb.BeanManagerFactory;
 import org.wildfly.clustering.ejb.BeanManagerFactoryServiceConfiguratorConfiguration;
 import org.wildfly.clustering.ejb.BeanPassivationConfiguration;
+import org.wildfly.clustering.group.Group;
 import org.wildfly.clustering.infinispan.spi.InfinispanCacheRequirement;
 import org.wildfly.clustering.infinispan.spi.InfinispanRequirement;
 import org.wildfly.clustering.infinispan.spi.affinity.KeyAffinityServiceFactory;
 import org.wildfly.clustering.marshalling.jboss.MarshallingConfigurationRepository;
-import org.wildfly.clustering.registry.Registry;
 import org.wildfly.clustering.service.CompositeDependency;
 import org.wildfly.clustering.service.ServiceConfigurator;
 import org.wildfly.clustering.service.ServiceSupplierDependency;
@@ -68,8 +68,8 @@ public class InfinispanBeanManagerFactoryServiceConfigurator<I, T> extends Simpl
 
     private volatile SupplierDependency<Cache<?, ?>> cache;
     private volatile SupplierDependency<KeyAffinityServiceFactory> affinityFactory;
-    private volatile SupplierDependency<NodeFactory<Address>> group;
-    private volatile SupplierDependency<Registry<String, ?>> registry;
+    private volatile SupplierDependency<Group> group;
+    private volatile SupplierDependency<NodeFactory<Address>> memberFactory;
     private volatile SupplierDependency<CommandDispatcherFactory> dispatcherFactory;
 
     public InfinispanBeanManagerFactoryServiceConfigurator(String name, BeanContext context, BeanManagerFactoryServiceConfiguratorConfiguration configuration) {
@@ -86,18 +86,19 @@ public class InfinispanBeanManagerFactoryServiceConfigurator<I, T> extends Simpl
     public ServiceConfigurator configure(CapabilityServiceSupport support) {
         String containerName = this.configuration.getContainerName();
         ServiceName deploymentUnitServiceName = this.context.getDeploymentUnitServiceName();
-        this.cache = new ServiceSupplierDependency<>(InfinispanCacheRequirement.CACHE.getServiceName(support, containerName, InfinispanBeanManagerFactoryServiceConfiguratorFactory.getCacheName(deploymentUnitServiceName, this.name)));
+        String cacheName = InfinispanBeanManagerFactoryServiceConfiguratorFactory.getCacheName(deploymentUnitServiceName, this.name);
+        this.cache = new ServiceSupplierDependency<>(InfinispanCacheRequirement.CACHE.getServiceName(support, containerName, cacheName));
         this.affinityFactory = new ServiceSupplierDependency<>(InfinispanRequirement.KEY_AFFINITY_FACTORY.getServiceName(support, containerName));
         this.dispatcherFactory = new ServiceSupplierDependency<>(ClusteringRequirement.COMMAND_DISPATCHER_FACTORY.getServiceName(support, containerName));
-        this.registry = new ServiceSupplierDependency<>(ClusteringCacheRequirement.REGISTRY.getServiceName(support, containerName, BeanManagerFactoryServiceConfiguratorConfiguration.CLIENT_MAPPINGS_CACHE_NAME));
-        this.group = new ServiceSupplierDependency<>(ClusteringCacheRequirement.GROUP.getServiceName(support, containerName, BeanManagerFactoryServiceConfiguratorConfiguration.CLIENT_MAPPINGS_CACHE_NAME));
+        this.group = new ServiceSupplierDependency<>(ClusteringCacheRequirement.GROUP.getServiceName(support, containerName, cacheName));
+        this.memberFactory = new ServiceSupplierDependency<>(ClusteringCacheRequirement.GROUP.getServiceName(support, containerName, cacheName));
         return this;
     }
 
     @Override
     public ServiceBuilder<?> build(ServiceTarget target) {
         ServiceBuilder<?> builder = target.addService(this.getServiceName());
-        new CompositeDependency(this.cache, this.affinityFactory, this.repository, this.scheduler, this.group, this.registry, this.dispatcherFactory).register(builder);
+        new CompositeDependency(this.cache, this.affinityFactory, this.repository, this.scheduler, this.group, this.memberFactory, this.dispatcherFactory).register(builder);
         Consumer<BeanManagerFactory<I, T, TransactionBatch>> factory = builder.provides(this.getServiceName());
         Service service = Service.newInstance(factory, new InfinispanBeanManagerFactory<>(this));
         return builder.setInstance(service).setInitialMode(ServiceController.Mode.ON_DEMAND);
@@ -140,13 +141,13 @@ public class InfinispanBeanManagerFactoryServiceConfigurator<I, T> extends Simpl
     }
 
     @Override
-    public NodeFactory<Address> getNodeFactory() {
+    public Group getGroup() {
         return this.group.get();
     }
 
     @Override
-    public Registry<String, ?> getRegistry() {
-        return this.registry.get();
+    public NodeFactory<Address> getMemberFactory() {
+        return this.memberFactory.get();
     }
 
     @Override
