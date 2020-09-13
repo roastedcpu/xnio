@@ -1138,25 +1138,9 @@
                             </plugin-options>
                             <feature-packs>
                                 <feature-pack>
-                                    <transitive>true</transitive>
-                                    <groupId>org.wildfly.core</groupId>
-                                    <artifactId>wildfly-core-galleon-pack</artifactId>
-                                    <version>${version.org.wildfly.core}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <transitive>true</transitive>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-servlet-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
-                                    <inherit-configs>false</inherit-configs>
-                                    <inherit-packages>false</inherit-packages>
-                                </feature-pack>
-                                <feature-pack>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>wildfly-galleon-pack</artifactId>
-                                    <version>${project.version}</version>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
                                     <inherit-configs>false</inherit-configs>
                                     <inherit-packages>false</inherit-packages>
                                 </feature-pack>
