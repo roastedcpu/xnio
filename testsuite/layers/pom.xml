@@ -2140,7 +2140,6 @@
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
                                         <layer>resource-adapters</layer>
-                                        <layer>secure-management</layer>
                                         <layer>security-manager</layer>
                                         <layer>transactions</layer>
                                         <layer>undertow</layer>
@@ -2227,7 +2226,6 @@
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
                                         <layer>resource-adapters</layer>
-                                        <layer>secure-management</layer>
                                         <layer>security-manager</layer>
                                         <layer>transactions</layer>
                                         <layer>undertow</layer>
