@@ -2123,6 +2123,7 @@
                                         <layer>naming</layer>
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
+                                        <layer>request-controller</layer>
                                         <layer>resource-adapters</layer>
                                         <layer>security-manager</layer>
                                         <layer>transactions</layer>
@@ -2146,7 +2147,7 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <install-dir>${layers.install.dir}/test-all-jpa-distributed-layers</install-dir>
+                            <install-dir>${layers.install.dir}/test-all-layers-jpa-distributed</install-dir>
                             <record-state>false</record-state>
                             <log-time>${galleon.log.time}</log-time>
                             <offline>true</offline>
