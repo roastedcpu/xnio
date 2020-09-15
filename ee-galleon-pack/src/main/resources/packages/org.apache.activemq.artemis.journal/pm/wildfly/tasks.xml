@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
 <tasks xmlns="urn:wildfly:wildfly-feature-pack-tasks:2.0">
-    <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-i686:::so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-i686/libartemis-native-linux-i686.so"/>
-    <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-x86_64:::so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-x86_64/libartemis-native-linux-x86_64.so"/>
+    <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-i686:::so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-i686/libartemis-native-32.so"/>
+    <copy-artifact artifact="org.apache.activemq:libartemis-native-linux-x86_64:::so" to-location="modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-x86_64/libartemis-native-64.so"/>
 </tasks>
