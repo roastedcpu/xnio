@@ -25,6 +25,7 @@ package org.jboss.as.test.integration.weld.jpa;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 
+import org.junit.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -32,9 +33,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 /**
@@ -74,15 +73,20 @@ public class WeldJpaInjectionTestCase {
         return jar;
     }
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
     @Inject
     private CdiJpaInjectingBean bean;
 
     @Test
     public void testOrmXmlDefinedEmployeeEntity() {
-        expected.expect(NoResultException.class);
-        bean.queryEmployeeName(1);
+
+        try {
+            Employee emp = bean.queryEmployeeName(1);
+        } catch (Exception e) {
+            if (!(e instanceof NoResultException)){
+                Assert.fail("Expected NoResultException but got " + e);
+            }
+            return;
+        }
+        Assert.fail("NoResultException should occur but didn't!");
     }
 }
