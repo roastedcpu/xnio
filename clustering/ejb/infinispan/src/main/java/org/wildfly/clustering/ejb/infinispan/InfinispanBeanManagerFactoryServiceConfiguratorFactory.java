@@ -24,9 +24,11 @@ package org.wildfly.clustering.ejb.infinispan;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -36,9 +38,11 @@ import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.eviction.EvictionType;
 import org.jboss.as.clustering.controller.CapabilityServiceConfigurator;
 import org.jboss.as.clustering.controller.ServiceConfiguratorAdapter;
+import org.jboss.as.controller.ServiceNameFactory;
 import org.jboss.as.server.deployment.Services;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.threads.JBossThreadFactory;
+import org.wildfly.clustering.ee.CompositeIterable;
 import org.wildfly.clustering.ejb.BeanContext;
 import org.wildfly.clustering.ejb.BeanManagerFactory;
 import org.wildfly.clustering.ejb.BeanManagerFactoryServiceConfiguratorConfiguration;
@@ -50,6 +54,10 @@ import org.wildfly.clustering.infinispan.spi.service.CacheServiceConfigurator;
 import org.wildfly.clustering.infinispan.spi.service.TemplateConfigurationServiceConfigurator;
 import org.wildfly.clustering.service.ServiceDependency;
 import org.wildfly.clustering.service.concurrent.RemoveOnCancelScheduledExecutorServiceConfigurator;
+import org.wildfly.clustering.service.ServiceNameRegistry;
+import org.wildfly.clustering.spi.CacheServiceConfiguratorProvider;
+import org.wildfly.clustering.spi.ClusteringCacheRequirement;
+import org.wildfly.clustering.spi.DistributedCacheServiceConfiguratorProvider;
 
 /**
  * Builds an infinispan-based {@link BeanManagerFactory}.
@@ -91,7 +99,7 @@ public class InfinispanBeanManagerFactoryServiceConfiguratorFactory<I> implement
     }
 
     @Override
-    public Collection<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(final ServiceName name) {
+    public Iterable<CapabilityServiceConfigurator> getDeploymentServiceConfigurators(final ServiceName name) {
         String cacheName = getCacheName(name, this.name);
         String containerName = this.config.getContainerName();
         String templateCacheName = this.config.getCacheName();
@@ -116,11 +124,23 @@ public class InfinispanBeanManagerFactoryServiceConfiguratorFactory<I> implement
             }
         };
 
-        List<CapabilityServiceConfigurator> builders = new ArrayList<>(3);
-        builders.add(new TemplateConfigurationServiceConfigurator(ServiceName.parse(InfinispanCacheRequirement.CONFIGURATION.resolve(containerName, cacheName)), containerName, cacheName, templateCacheName, configurator));
-        builders.add(new CacheServiceConfigurator<>(ServiceName.parse(InfinispanCacheRequirement.CACHE.resolve(containerName, cacheName)), containerName, cacheName).require(new ServiceDependency(name.append("marshalling"))));
-        builders.add(new ServiceConfiguratorAdapter(new RemoveOnCancelScheduledExecutorServiceConfigurator(name.append(this.name, "expiration"), EXPIRATION_THREAD_FACTORY)));
-        return builders;
+        CapabilityServiceConfigurator configurationConfigurator = new TemplateConfigurationServiceConfigurator(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CONFIGURATION.getName()).append(containerName, cacheName), containerName, cacheName, templateCacheName, configurator);
+        CapabilityServiceConfigurator cacheConfigurator = new CacheServiceConfigurator<>(ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CACHE.getName()).append(containerName, cacheName), containerName, cacheName).require(new ServiceDependency(name.append("marshalling")));
+        CapabilityServiceConfigurator executorConfigurator = new ServiceConfiguratorAdapter(new RemoveOnCancelScheduledExecutorServiceConfigurator(name.append(this.name, "expiration"), EXPIRATION_THREAD_FACTORY));
+
+        List<Iterable<CapabilityServiceConfigurator>> configurators = new LinkedList<>();
+        configurators.add(Arrays.asList(configurationConfigurator, cacheConfigurator, executorConfigurator));
+
+        ServiceNameRegistry<ClusteringCacheRequirement> registry = new ServiceNameRegistry<ClusteringCacheRequirement>() {
+            @Override
+            public ServiceName getServiceName(ClusteringCacheRequirement requirement) {
+                return (requirement == ClusteringCacheRequirement.GROUP) ? ServiceNameFactory.parseServiceName(requirement.getName()).append(containerName, cacheName) : null;
+            }
+        };
+        for (CacheServiceConfiguratorProvider provider : ServiceLoader.load(DistributedCacheServiceConfiguratorProvider.class, DistributedCacheServiceConfiguratorProvider.class.getClassLoader())) {
+            configurators.add(provider.getServiceConfigurators(registry, containerName, cacheName));
+        }
+        return new CompositeIterable<>(configurators);
     }
 
     @Override

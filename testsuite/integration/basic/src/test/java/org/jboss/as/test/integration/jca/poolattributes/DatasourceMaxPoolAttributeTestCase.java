@@ -113,7 +113,7 @@ public class DatasourceMaxPoolAttributeTestCase extends JcaMgmtBase {
                 "org.jboss.ironjacamar.api," +
                 "org.jboss.ironjacamar.impl," +
                 "org.jboss.ironjacamar.jdbcadapters," +
-                "org.jboss.remoting3\n"), "MANIFEST.MF");
+                "org.jboss.remoting\n"), "MANIFEST.MF");
 
         jar.addAsManifestResource(createPermissionsXmlAsset(
                 new RuntimePermission("accessDeclaredMembers"),

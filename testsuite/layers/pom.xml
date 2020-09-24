@@ -193,6 +193,47 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>cloud-server-jpa-distributed-h2-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/cloud-server-h2</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>cloud-server</layer>
+                                        <layer>jpa-distributed</layer>
+                                        <layer>h2-default-datasource</layer>
+                                    </layers>
+                                    <excluded-layers>
+                                        <layer>jpa</layer>
+                                    </excluded-layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>datasources-web-server-provisioning-test</id>
                         <goals>
                             <goal>provision</goal>
@@ -336,6 +377,44 @@
                                     <layers>
                                         <layer>datasources-web-server</layer>
                                         <layer>h2-default-datasource</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>datasources-web-server-jpa-distributed-h2-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/datasources-web-server-h2</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>datasources-web-server</layer>
+                                        <layer>h2-default-datasource</layer>
+                                        <layer>jpa-distributed</layer>
                                     </layers>
                                 </config>
                             </configurations>
@@ -1042,6 +1121,42 @@
                     </execution>
                     <!-- wildfly layers -->
                     <execution>
+                        <id>bean-validation-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/bean-validation</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>bean-validation</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>cdi-provisioning</id>
                         <goals>
                             <goal>provision</goal>
@@ -1221,6 +1336,190 @@
                             </configurations>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>ejb-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/ejb</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>ejb</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ejb-lite-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/ejb-lite</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>ejb-lite</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ejb-lite-dist-cache-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/ejb-lite-dist-cache</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>ejb-lite</layer>
+                                        <layer>ejb-dist-cache</layer>
+                                    </layers>
+                                    <excluded-layers>
+                                        <layer>ejb-local-cache</layer>
+                                    </excluded-layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ejb-dist-cache-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/ejb-dist-cache</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>ejb-dist-cache</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ejb-local-cache-provisioning-test</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/ejb-local-cache</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>ejb-local-cache</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
                     <execution>   
                         <id>h2-datasource-provisioning</id>
                         <goals>
@@ -1371,6 +1670,42 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>jdr-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/jdr</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>jdr</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>jms-activemq-provisioning</id>
                         <goals>
                             <goal>provision</goal>
@@ -1401,6 +1736,42 @@
                                     <name>standalone.xml</name>
                                     <layers>
                                         <layer>jms-activemq</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remote-activemq-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/remote-activemq</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>remote-activemq</layer>
                                     </layers>
                                 </config>
                             </configurations>
@@ -1437,6 +1808,42 @@
                                     <name>standalone.xml</name>
                                     <layers>
                                         <layer>jpa</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jsf-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/jsf</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>jsf</layer>
                                     </layers>
                                 </config>
                             </configurations>
@@ -1939,6 +2346,78 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>web-console-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/web-console</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>web-console</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>webservices-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/webservices</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                    <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                    <version>${testsuite.ee.galleon.pack.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>webservices</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>all-layers-provisioning-full</id>
                         <goals>
                             <goal>provision</goal>
@@ -1968,24 +2447,235 @@
                                     <model>standalone</model>
                                     <name>standalone.xml</name>
                                     <layers>
+                                        <layer>application-security-realm</layer>
+                                        <layer>base-server</layer>
+                                        <layer>bean-validation</layer>
                                         <layer>cdi</layer>
                                         <layer>cloud-profile</layer>
+                                        <layer>cloud-server</layer>
+                                        <layer>core-management</layer>
+                                        <layer>core-security-realms</layer>
+                                        <layer>core-server</layer>
+                                        <layer>core-tools</layer>
                                         <layer>datasources</layer>
-                                        <layer>h2-driver</layer>
-                                        <layer>h2-datasource</layer>
-                                        <layer>h2-default-datasource</layer>
+                                        <layer>datasources-web-server</layer>
+                                        <layer>deployment-scanner</layer>
+                                        <layer>discovery</layer>
                                         <layer>ee</layer>
                                         <layer>ee-security</layer>
+                                        <layer>ejb</layer>
+                                        <layer>ejb-lite</layer>
+                                        <layer>elytron</layer>
+                                        <layer>h2-datasource</layer>
+                                        <layer>h2-default-datasource</layer>
+                                        <layer>h2-driver</layer>
+                                        <layer>io</layer>
                                         <layer>jaxrs</layer>
-                                        <layer>jms-activemq</layer>
+                                        <layer>jaxrs-server</layer>
+                                        <layer>jdr</layer>
+                                        <layer>jmx</layer>
+                                        <layer>jmx-remoting</layer>
                                         <layer>jpa</layer>
+                                        <layer>jsf</layer>
+                                        <layer>legacy-management</layer>
+                                        <layer>legacy-security</layer>
+                                        <layer>logging</layer>
+                                        <layer>management</layer>
+                                        <layer>management-security-realm</layer>
+                                        <layer>messaging-activemq</layer>
+                                        <layer>microprofile-config</layer>
+                                        <layer>microprofile-fault-tolerance</layer>
+                                        <layer>microprofile-jwt</layer>
+                                        <layer>microprofile-metrics</layer>
+                                        <layer>microprofile-openapi</layer>
+                                        <layer>naming</layer>
                                         <layer>observability</layer>
                                         <layer>open-tracing</layer>
+                                        <layer>request-controller</layer>
+                                        <layer>remote-activemq</layer>
                                         <layer>resource-adapters</layer>
+                                        <layer>security-manager</layer>
                                         <layer>transactions</layer>
                                         <layer>undertow</layer>
                                         <layer>undertow-legacy-https</layer>
+                                        <layer>undertow-load-balancer</layer>
                                         <layer>vault</layer>
+                                        <layer>web-clustering</layer>
+                                        <layer>web-console</layer>
+                                        <layer>web-server</layer>
+                                        <layer>webservices</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+
+                    <!-- This is an all layers variant excluding jpa and adding jpa-distributed -->
+                    <execution>
+                        <id>all-layers-jpa-distributed-provisioning-full</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${layers.install.dir}/test-all-layers-jpa-distributed</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${full.maven.groupId}</groupId>
+                                    <artifactId>wildfly-galleon-pack</artifactId>
+                                    <version>${full.maven.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>application-security-realm</layer>
+                                        <layer>base-server</layer>
+                                        <layer>bean-validation</layer>
+                                        <layer>cdi</layer>
+                                        <layer>cloud-profile</layer>
+                                        <layer>cloud-server</layer>
+                                        <layer>core-management</layer>
+                                        <layer>core-security-realms</layer>
+                                        <layer>core-server</layer>
+                                        <layer>core-tools</layer>
+                                        <layer>datasources</layer>
+                                        <layer>datasources-web-server</layer>
+                                        <layer>deployment-scanner</layer>
+                                        <layer>discovery</layer>
+                                        <layer>ee</layer>
+                                        <layer>ee-security</layer>
+                                        <layer>ejb</layer>
+                                        <layer>ejb-lite</layer>
+                                        <layer>elytron</layer>
+                                        <layer>h2-datasource</layer>
+                                        <layer>h2-default-datasource</layer>
+                                        <layer>h2-driver</layer>
+                                        <layer>io</layer>
+                                        <layer>jaxrs</layer>
+                                        <layer>jaxrs-server</layer>
+                                        <layer>jdr</layer>
+                                        <layer>jmx</layer>
+                                        <layer>jmx-remoting</layer>
+                                        <layer>jpa-distributed</layer>
+                                        <layer>jsf</layer>
+                                        <layer>legacy-management</layer>
+                                        <layer>legacy-security</layer>
+                                        <layer>logging</layer>
+                                        <layer>management</layer>
+                                        <layer>management-security-realm</layer>
+                                        <layer>microprofile-config</layer>
+                                        <layer>messaging-activemq</layer>
+                                        <layer>microprofile-fault-tolerance</layer>
+                                        <layer>microprofile-jwt</layer>
+                                        <layer>microprofile-metrics</layer>
+                                        <layer>microprofile-openapi</layer>
+                                        <layer>naming</layer>
+                                        <layer>observability</layer>
+                                        <layer>open-tracing</layer>
+                                        <layer>remote-activemq</layer>
+                                        <layer>remoting</layer>
+                                        <layer>resource-adapters</layer>
+                                        <layer>security-manager</layer>
+                                        <layer>transactions</layer>
+                                        <layer>undertow</layer>
+                                        <layer>undertow-legacy-https</layer>
+                                        <layer>undertow-load-balancer</layer>
+                                        <layer>vault</layer>
+                                        <layer>web-clustering</layer>
+                                        <layer>web-console</layer>
+                                        <layer>web-server</layer>
+                                        <layer>webservices</layer>
+                                    </layers>
+                                    <excluded-layers>
+                                        <layer>jpa</layer>
+                                    </excluded-layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <!-- Core layers which require Undertow -->
+                    <execution>
+                        <id>remoting-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${project.build.directory}/layers-results/remoting</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${full.maven.groupId}</groupId>
+                                    <artifactId>wildfly-galleon-pack</artifactId>
+                                    <version>${full.maven.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>remoting</layer>
+                                        <layer>undertow</layer>
+                                    </layers>
+                                </config>
+                            </configurations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>legacy-remoting-provisioning</id>
+                        <goals>
+                            <goal>provision</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <install-dir>${project.build.directory}/layers-results/remoting</install-dir>
+                            <record-state>false</record-state>
+                            <log-time>${galleon.log.time}</log-time>
+                            <offline>true</offline>
+                            <plugin-options>
+                                <jboss-maven-dist/>
+                                <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                <optional-packages>passive+</optional-packages>
+                            </plugin-options>
+                            <feature-packs>
+                                <feature-pack>
+                                    <groupId>${full.maven.groupId}</groupId>
+                                    <artifactId>wildfly-galleon-pack</artifactId>
+                                    <version>${full.maven.version}</version>
+                                    <inherit-configs>false</inherit-configs>
+                                    <inherit-packages>false</inherit-packages>
+                                </feature-pack>
+                            </feature-packs>
+                            <configurations>
+                                <config>
+                                    <model>standalone</model>
+                                    <name>standalone.xml</name>
+                                    <layers>
+                                        <layer>legacy-remoting</layer>
+                                        <layer>undertow</layer>
                                     </layers>
                                 </config>
                             </configurations>

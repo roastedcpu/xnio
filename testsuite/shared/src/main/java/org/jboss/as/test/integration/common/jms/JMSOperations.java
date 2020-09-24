@@ -98,6 +98,8 @@ public interface JMSOperations {
 
     void addExternalHttpConnector(String connectorName, String socketBinding, String endpoint);
 
+    void addExternalRemoteConnector(String name, String socketBinding);
+
     void removeExternalHttpConnector(String connectorName);
 
     /**
@@ -108,4 +110,6 @@ public interface JMSOperations {
     void setSystemProperties(String destination, String resourceAdapter);
 
     void removeSystemProperties();
+
+    boolean isRemoteBroker();
 }
