@@ -49,12 +49,14 @@ import org.jboss.jandex.DotName;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.StartException;
 import org.jboss.vfs.VirtualFile;
 
 /**
@@ -1146,5 +1148,12 @@ public interface EeLogger extends BasicLogger {
     //        "version of the API differs from what is supported in EE 7, the EE 7 variant of the API will be used. " +
     //        "Support for this setting will be removed once all EE 8 APIs are provided and certified.")
     //void notUsingEE8PreviewMode();
+
+    @LogMessage(level = Level.WARN)
+    @Message(id = 124, value = "Error deleting JACC Policy")
+    void errorDeletingJACCPolicy(@Cause Throwable t);
+
+    @Message(id = 125, value = "Unable to start the %s service")
+    StartException unableToStartException(String service, @Cause Throwable t);
 
 }
