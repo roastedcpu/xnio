@@ -57,7 +57,6 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.ejb3.security.ApplicationSecurityDomainConfig;
 import org.jboss.as.ejb3.subsystem.ApplicationSecurityDomainService.ApplicationSecurityDomain;
-import org.jboss.as.security.Constants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceBuilder;
@@ -167,7 +166,7 @@ public class ApplicationSecurityDomainDefinition extends SimpleResourceDefinitio
             boolean enableJacc = ENABLE_JACC.resolveModelAttribute(context, model).asBoolean();
             RuntimeCapability<?> runtimeCapability = APPLICATION_SECURITY_DOMAIN_RUNTIME_CAPABILITY.fromBaseCapability(context.getCurrentAddressValue());
             ServiceName serviceName = runtimeCapability.getCapabilityServiceName(ApplicationSecurityDomain.class);
-            ServiceName securityDomainServiceName = serviceName.append(Constants.SECURITY_DOMAIN);
+            ServiceName securityDomainServiceName = serviceName.append("security-domain");
 
             ServiceBuilder<?> serviceBuilder = context.getServiceTarget().addService(serviceName)
                     .setInitialMode(Mode.LAZY);
