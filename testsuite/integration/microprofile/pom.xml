@@ -486,9 +486,7 @@
                                     </feature-packs>
                                     <layers>
                                         <layer>cloud-server</layer>
-                                        <layer>microprofile-openapi</layer>
-                                        <layer>microprofile-jwt</layer>
-                                        <layer>microprofile-fault-tolerance</layer>
+                                        <layer>microprofile-platform</layer>
                                     </layers>
                                 </configuration>
                             </execution>

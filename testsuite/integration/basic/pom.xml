@@ -2613,6 +2613,41 @@
                                 </configuration>
                             </execution>
 
+                            <!-- Package a server with microprofile-platform -->
+                            <execution>
+                                <id>bootable-jar-microprofile-packaging</id>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <output-file-name>test-wildfly-microprofile.jar</output-file-name>
+                                    <hollowJar>true</hollowJar>
+                                    <record-state>false</record-state>
+                                    <log-time>${galleon.log.time}</log-time>
+                                    <extraServerContent>
+                                        <extraServerContent>${project.build.directory}/extraContent/</extraServerContent>
+                                    </extraServerContent>
+                                    <offline>true</offline>
+                                    <plugin-options>
+                                        <jboss-maven-dist/>
+                                        <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+                                    </plugin-options>
+                                    <feature-packs>
+                                        <feature-pack>
+                                            <groupId>${testsuite.ee.galleon.pack.groupId}</groupId>
+                                            <artifactId>${testsuite.ee.galleon.pack.artifactId}</artifactId>
+                                            <version>${testsuite.ee.galleon.pack.version}</version>
+                                        </feature-pack>
+                                    </feature-packs>
+                                    <layers>
+                                        <layer>cloud-server</layer>
+                                        <layer>microprofile-platform</layer>
+                                        <layer>h2-default-datasource</layer>
+                                    </layers>
+                                </configuration>
+                            </execution>
+
                         </executions>
                     </plugin>
 
@@ -2796,6 +2831,57 @@
                                         <!-- WebJPATestCase is currently the only test that does not need EJB -->
                                         <include>org/jboss/as/test/integration/jpa/**/WebJPATestCase.java</include>
                                     </includes>
+                                    <classpathDependencyExcludes>
+                                        <classpathDependencyExclude>
+                                            org.wildfly.arquillian:wildfly-arquillian-container-managed
+                                        </classpathDependencyExclude>
+                                    </classpathDependencyExcludes>
+                                </configuration>
+                            </execution>
+
+                            <!-- Tests against a server provisioned with microprofile-platform -->
+                            <execution>
+                                <id>microprofile-platform-layer.surefire</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <systemPropertyVariables>
+                                        <install.dir>${project.build.directory}/wildfly-bootable-microprofile</install.dir>
+                                        <bootable.jar>${project.build.directory}/test-wildfly-microprofile.jar</bootable.jar>
+                                        <arquillian.xml>arquillian-bootable.xml</arquillian.xml>
+                                    </systemPropertyVariables>
+                                    <environmentVariables>
+                                        <JBOSS_HOME>${project.build.directory}/wildfly-microprofile-platform</JBOSS_HOME>
+                                        <!-- dummy env property for MicroProfile Config testing -->
+                                        <MPCONFIG_TEST_ENV_VAR>integ-basicmpconfig-test-env-var-value</MPCONFIG_TEST_ENV_VAR>
+                                        <TEST_PROP>JMXPropertyEditorsTestCase-WFLY-12899</TEST_PROP>
+                                    </environmentVariables>
+                                    <redirectTestOutputToFile>${testLogToFile}</redirectTestOutputToFile>
+                                    <includes>
+                                        <include>org/wildfly/test/integration/microprofile/**/*TestCase.java</include>
+                                    </includes>
+                                    <excludes>
+                                        <!-- Requires extra modules -->
+                                        <exclude>org/wildfly/test/integration/microprofile/config/smallrye/converter/MicroProfileConfigConvertersTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/config/smallrye/management/config_source/ConfigSourceFromClassTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/config/smallrye/management/config_source_provider/ConfigSourceProviderFromClassTestCase</exclude>
+                                        <!-- Requires security -->
+                                        <exclude>org/wildfly/test/integration/microprofile/health/MicroProfileHealthSecuredHTTPEndpointEmptyMgmtUsersTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/health/MicroProfileHealthSecuredHTTPEndpointTestCase</exclude>
+                                        <!-- Requires EJB -->
+                                        <exclude>org/wildfly/test/integration/microprofile/jwt/ejb/JWTEJBTestCase</exclude>
+                                        <!-- Requires security -->
+                                        <exclude>org/wildfly/test/integration/microprofile/metrics/secured/MicroProfileMetricsSecuredEndpointEmptyMgmtUsersTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/metrics/secured/MicroProfileMetricsSecuredEndpointTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/metrics/vendor/MicroProfileVendorMetricsBootTestCase</exclude>
+                                        <!-- Requires extra modules -->
+                                        <exclude>org/wildfly/test/integration/microprofile/opentracing/MultiTracerTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/opentracing/TraceErrorTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/opentracing/WildCardTestCase</exclude>
+                                        <exclude>org/wildfly/test/integration/microprofile/opentracing/jaxrs/ResteasyProvidersTestCase</exclude>
+                                    </excludes>
                                     <classpathDependencyExcludes>
                                         <classpathDependencyExclude>
                                             org.wildfly.arquillian:wildfly-arquillian-container-managed
