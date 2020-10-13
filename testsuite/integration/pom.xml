@@ -333,7 +333,7 @@
             <properties>
                 <version.org.jboss.arquillian.core>1.6.0.Final</version.org.jboss.arquillian.core>
                 <version.org.wildfly.arquillian>3.0.1.Final</version.org.wildfly.arquillian>
-                <version.org.wildfly.jar.plugin>2.0.0.Beta7</version.org.wildfly.jar.plugin>
+                <version.org.wildfly.jar.plugin>2.0.0.Final</version.org.wildfly.jar.plugin>
                 <!-- Control the launcher dep used by arquillian so it uses one that supports bootable jar -->
                 <version.org.wildfly.core.launcher>12.0.3.Final</version.org.wildfly.core.launcher>
             </properties>
