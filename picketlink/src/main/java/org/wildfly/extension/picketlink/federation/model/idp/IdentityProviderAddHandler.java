@@ -33,10 +33,10 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.Resource;
-import org.jboss.as.security.service.SecurityDomainService;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
 import org.picketlink.identity.federation.bindings.wildfly.idp.UndertowAttributeManager;
 import org.picketlink.identity.federation.bindings.wildfly.idp.UndertowRoleGenerator;
 import org.wildfly.extension.picketlink.common.model.ModelElement;
@@ -49,6 +49,8 @@ import org.wildfly.extension.picketlink.federation.service.IdentityProviderServi
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  */
 public class IdentityProviderAddHandler extends AbstractEntityProviderAddHandler {
+
+    private static final ServiceName SECURITY_DOMAIN_SERVICE = ServiceName.JBOSS.append("security", "security-domain");
 
     static final IdentityProviderAddHandler INSTANCE = new IdentityProviderAddHandler();
 
@@ -98,7 +100,7 @@ public class IdentityProviderAddHandler extends AbstractEntityProviderAddHandler
         IDPConfiguration configuration = service.getConfiguration();
 
         if (!configuration.isExternal()) {
-            serviceBuilder.requires(SecurityDomainService.SERVICE_NAME.append(configuration.getSecurityDomain()));
+            serviceBuilder.requires(SECURITY_DOMAIN_SERVICE.append(configuration.getSecurityDomain()));
         }
 
         serviceBuilder.install();

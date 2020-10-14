@@ -35,7 +35,7 @@
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
     -->
-    <version>7.3.3.GA-redhat-SNAPSHOT</version>
+    <version>7.3.4.GA-redhat-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -133,7 +133,7 @@
         <!-- Other release identification information that drives how the built server identifies itself -->
         <full.dist.product.release.name>JBoss EAP</full.dist.product.release.name>
         <full.dist.product.slot>eap</full.dist.product.slot>
-        <full.dist.product.release.version>7.3.3.GA</full.dist.product.release.version>
+        <full.dist.product.release.version>7.3.4.GA</full.dist.product.release.version>
         <full.maven.groupId>${project.groupId}</full.maven.groupId>
         <full.maven.version>${project.version}</full.maven.version>
         <ee.dist.product.release.name>${full.dist.product.release.name}</ee.dist.product.release.name>
@@ -145,7 +145,7 @@
         <servlet.dist.product.slot>wildfly-web</servlet.dist.product.slot>
         <servlet.dist.product.release.version>${ee.dist.product.release.version}</servlet.dist.product.release.version>
         <expansion.pack.release.name>JBoss EAP XP</expansion.pack.release.name>
-        <expansion.pack.release.version>1.0.2.GA</expansion.pack.release.version>
+        <expansion.pack.release.version>1.0.3.GA</expansion.pack.release.version>
         <jboss.eap.release.version>7.3</jboss.eap.release.version>
         <product.docs.server.version>18</product.docs.server.version>
         <!-- A short variant of product.release.version used in 'startsWith' tests done by dist verification logic -->
@@ -229,14 +229,14 @@
         <version.asciidoctor.plugin>1.5.6</version.asciidoctor.plugin>
         <version.help.plugin>2.2</version.help.plugin>
         <version.jacoco.plugin>0.8.2</version.jacoco.plugin><!-- TODO property does not follow verion.groupId format -->
-        <version.org.jboss.galleon>4.2.4.Final</version.org.jboss.galleon>
+        <version.org.jboss.galleon>4.2.6.Final</version.org.jboss.galleon>
         <version.org.wildfly.build-tools>1.2.12.Final</version.org.wildfly.build-tools>
         <version.org.wildfly.checkstyle-config>1.0.8.Final</version.org.wildfly.checkstyle-config>
         <!-- This is used for the Galleon plugin. While it doesn't end up in the final distribution from any feature packs here,
              we should keep this the same as the version in core for consistency. -->
         <version.org.wildfly.common>1.5.2.Final-redhat-00002</version.org.wildfly.common>
         <version.org.wildfly.component-matrix-plugin>1.0.3.Final</version.org.wildfly.component-matrix-plugin>
-        <version.org.wildfly.galleon-plugins>4.2.4.Final</version.org.wildfly.galleon-plugins>
+        <version.org.wildfly.galleon-plugins>4.2.8.Final</version.org.wildfly.galleon-plugins>
         <version.org.wildfly.maven.plugins>2.0.0.Final</version.org.wildfly.maven.plugins>
         <version.org.wildfly.plugin>1.2.1.Final</version.org.wildfly.plugin>
         <version.org.zanata.plugin>3.9.1</version.org.zanata.plugin>
@@ -442,7 +442,7 @@
         <version.org.syslog4j>0.9.30</version.org.syslog4j>
         <version.org.testng>6.9.10</version.org.testng>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
-        <version.org.wildfly.core>10.1.12.SP1-redhat-00001</version.org.wildfly.core>
+        <version.org.wildfly.core>10.1.13.Final-redhat-00001</version.org.wildfly.core>
         <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
         <version.org.wildfly.http-client>1.0.22.Final-redhat-00001</version.org.wildfly.http-client>
         <version.org.wildfly.transaction.client>1.1.13.Final-redhat-00001</version.org.wildfly.transaction.client>
@@ -1171,6 +1171,24 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wildfly-security-api</artifactId>
+                <version>${ee.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-security-integration</artifactId>
+                <version>${ee.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-security-plugins</artifactId>
+                <version>${ee.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>wildfly-security-vault-tool</artifactId>
                 <version>${ee.maven.version}</version>
             </dependency>
 
@@ -8354,6 +8372,24 @@
             <dependency>
                 <groupId>org.wildfly.arquillian</groupId>
                 <artifactId>wildfly-arquillian-container-managed</artifactId>
+                <version>${version.org.wildfly.arquillian}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.sasl</groupId>
+                        <artifactId>jboss-sasl</artifactId>
+                    </exclusion>
+                    <!-- TODO remove this exclusion once this depends on Jakarta Inject -->
+                    <!-- superseded by jakarta.inject:jakarta.inject-api -->
+                    <exclusion>
+                        <groupId>javax.inject</groupId>
+                        <artifactId>javax.inject</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wildfly.arquillian</groupId>
+                <artifactId>wildfly-arquillian-container-bootable</artifactId>
                 <version>${version.org.wildfly.arquillian}</version>
                 <exclusions>
                     <exclusion>

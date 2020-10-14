@@ -34,6 +34,7 @@ import org.infinispan.distribution.LocalizedCacheTopology;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.TopologyChanged;
 import org.infinispan.notifications.cachelistener.event.TopologyChangedEvent;
+import org.jboss.as.controller.ServiceNameFactory;
 import org.jboss.as.server.CurrentServiceContainer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceName;
@@ -54,7 +55,7 @@ public class TopologyChangeListenerBean implements TopologyChangeListener {
     @Override
     public void establishTopology(String containerName, String cacheName, long timeout, String... nodes) throws InterruptedException {
         Set<String> expectedMembers = Stream.of(nodes).sorted().collect(Collectors.toSet());
-        ServiceName name = ServiceName.parse(InfinispanCacheRequirement.CACHE.resolve(containerName, cacheName));
+        ServiceName name = ServiceNameFactory.parseServiceName(InfinispanCacheRequirement.CACHE.getName()).append(containerName, cacheName);
         Cache<?, ?> cache = new PassiveServiceSupplier<Cache<?, ?>>(CurrentServiceContainer.getServiceContainer(), name).get();
         if (cache == null) {
             throw new IllegalStateException(String.format("Cache %s not found", name));
