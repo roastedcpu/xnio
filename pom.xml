@@ -367,7 +367,7 @@
         <version.org.hibernate>5.3.18.Final-redhat-00002</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.5.Final-redhat-00002</version.org.hibernate.commons.annotations>
         <version.org.hibernate.search>5.10.7.Final-redhat-00001</version.org.hibernate.search>
-        <version.org.hibernate.validator>6.0.20.Final-redhat-00001</version.org.hibernate.validator>
+        <version.org.hibernate.validator>6.0.21.Final-redhat-00001</version.org.hibernate.validator>
         <version.org.hornetq>2.4.7.Final-redhat-2</version.org.hornetq>
         <version.org.infinispan>9.4.19.Final-redhat-00001</version.org.infinispan>
         <version.org.jasypt>1.9.3.redhat-00001</version.org.jasypt>
