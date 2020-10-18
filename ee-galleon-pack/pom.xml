@@ -288,7 +288,37 @@
         <dependency>
             <groupId>com.github.fge</groupId>
             <artifactId>jackson-coreutils</artifactId>
-            <scope>provided</scope>
+	    <scope>provided</scope>
+	    <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>msg-simple</artifactId>
+	    <scope>provided</scope>
+	    <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>btf</artifactId>
+	    <scope>provided</scope>
+	    <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
