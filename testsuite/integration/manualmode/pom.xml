@@ -135,6 +135,35 @@
 
     <build>
         <plugins>
+            <!-- Update server profile with shared configuration changes -->
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.org.wildfly.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>ts.config-as.configure-wildfly</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute-commands</goal>
+                        </goals>
+                        <configuration>
+                            <offline>true</offline>
+                            <scripts>
+                                <script>manualmode-all.cli</script>
+                            </scripts>
+                            <jboss-home>${wildfly.dir}</jboss-home>
+                            <stdout>${project.build.directory}/wildfly-plugin.log</stdout>
+                            <java-opts>${modular.jdk.args}</java-opts>
+                            <system-properties>
+                                <maven.repo.local>${settings.localRepository}</maven.repo.local>
+                                <module.path>${jboss.dist}/modules</module.path>
+                            </system-properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Generate the keystores and truststore needed for the manualmode tests -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -225,35 +254,6 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Update server profile with shared configuration changes -->
-                    <plugin>
-                        <groupId>org.wildfly.plugins</groupId>
-                        <artifactId>wildfly-maven-plugin</artifactId>
-                        <version>${version.org.wildfly.plugin}</version>
-                        <executions>
-                            <execution>
-                                <id>ts.config-as.configure-wildfly</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>execute-commands</goal>
-                                </goals>
-                                <configuration>
-                                    <offline>true</offline>
-                                    <scripts>
-                                        <script>manualmode-all.cli</script>
-                                    </scripts>
-                                    <jboss-home>${wildfly.dir}</jboss-home>
-                                    <stdout>${project.build.directory}/wildfly-plugin.log</stdout>
-                                    <java-opts>${modular.jdk.args}</java-opts>
-                                    <system-properties>
-                                        <maven.repo.local>${settings.localRepository}</maven.repo.local>
-                                        <module.path>${jboss.dist}/modules</module.path>
-                                    </system-properties>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Generate the keystores and truststore needed for the manualmode tests -->
                     <plugin>
                         <!-- Disable the surefire tests -->
                         <groupId>org.apache.maven.plugins</groupId>
@@ -279,17 +279,17 @@
                         </executions>
                     </plugin>
                     <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-antrun-plugin</artifactId>
-		        <executions>
-		            <execution>
-		                <phase>none</phase>
-		                <goals>
-		                    <goal>run</goal>
-		                </goals>
-		            </execution>
-		        </executions>
-		    </plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>none</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -308,8 +308,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-		                <exclude>org/wildfly/test/manual/management/MPScriptTestCase.java</exclude>
-		            </excludes> 
+                                <exclude>org/wildfly/test/manual/management/MPScriptTestCase.java</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>
