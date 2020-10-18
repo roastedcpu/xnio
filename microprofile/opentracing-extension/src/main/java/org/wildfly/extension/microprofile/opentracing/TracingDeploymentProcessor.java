@@ -95,10 +95,9 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
             return;
         }
         String serviceName = getServiceName(deploymentUnit);
-        ParamValueMetaData serviceNameContextParameter = new ParamValueMetaData();
-        serviceNameContextParameter.setParamName(SMALLRYE_OPENTRACING_SERVICE_NAME);
+        ParamValueMetaData serviceNameContextParameter = getContextParam(jbossWebMetaData, SMALLRYE_OPENTRACING_SERVICE_NAME);
         serviceNameContextParameter.setParamValue(serviceName);
-        addContextParameter(jbossWebMetaData, serviceNameContextParameter);
+        addResteasyProvidersParameter(jbossWebMetaData);
     }
 
     private JBossWebMetaData getJBossWebMetaData(DeploymentUnit deploymentUnit) {
@@ -111,13 +110,34 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         return warMetaData.getMergedJBossWebMetaData();
     }
 
-    private void addContextParameter(JBossWebMetaData jbossWebMetaData, ParamValueMetaData restEasyProvider) {
+    private void addResteasyProvidersParameter(JBossWebMetaData jbossWebMetaData) {
+        if (jbossWebMetaData == null) {
+            return;
+        }
+        ParamValueMetaData restEasyDynamicFeature = getContextParam(jbossWebMetaData, "resteasy.providers");
+        if (restEasyDynamicFeature.getParamValue() != null && !restEasyDynamicFeature.getParamValue().trim().isEmpty()) {
+            restEasyDynamicFeature.setParamValue(restEasyDynamicFeature.getParamValue() + ",org.wildfly.microprofile.opentracing.smallrye.TracerDynamicFeature");
+        } else {
+            restEasyDynamicFeature.setParamValue("org.wildfly.microprofile.opentracing.smallrye.TracerDynamicFeature");
+        }
+    }
+
+    private ParamValueMetaData getContextParam(JBossWebMetaData jbossWebMetaData, String contextParamName) {
+        ParamValueMetaData emptyContextParam = new ParamValueMetaData();
+        emptyContextParam.setParamName(contextParamName);
         List<ParamValueMetaData> contextParams = jbossWebMetaData.getContextParams();
         if (null == contextParams) {
             contextParams = new ArrayList<>();
+            jbossWebMetaData.setContextParams(contextParams);
+            return emptyContextParam;
         }
-        contextParams.add(restEasyProvider);
-        jbossWebMetaData.setContextParams(contextParams);
+        for (ParamValueMetaData param : contextParams) {
+            if (contextParamName.equals(param.getParamName())) {
+                return param;
+            }
+        }
+        contextParams.add(emptyContextParam);
+        return emptyContextParam;
     }
 
     private String getServiceName(DeploymentUnit deploymentUnit) {
@@ -190,10 +210,7 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         if(jbossWebMetaData == null) {
             return;
         }
-        ParamValueMetaData restEasyDynamicFeature = new ParamValueMetaData();
-        restEasyDynamicFeature.setParamName("resteasy.providers");
-        restEasyDynamicFeature.setParamValue("org.wildfly.microprofile.opentracing.smallrye.TracerDynamicFeature");
-        addContextParameter(jbossWebMetaData, restEasyDynamicFeature);
+        addResteasyProvidersParameter(jbossWebMetaData);
 
         if (jbossWebMetaData.getFilters() == null) {
             jbossWebMetaData.setFilters(new FiltersMetaData());
