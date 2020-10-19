@@ -1915,6 +1915,13 @@ public class InfinispanSubsystemXMLReader implements XMLElementReader<List<Model
                         break;
                     }
                 }
+                case PROPERTY: {
+                    if (this.schema.since(InfinispanSchema.VERSION_9_1)) {
+                        ParseUtils.requireSingleAttribute(reader, XMLAttribute.NAME.getLocalName());
+                        readElement(reader, operation, RemoteCacheContainerResourceDefinition.Attribute.PROPERTIES);
+                        break;
+                    }
+                }
                 default: {
                     throw ParseUtils.unexpectedElement(reader);
                 }

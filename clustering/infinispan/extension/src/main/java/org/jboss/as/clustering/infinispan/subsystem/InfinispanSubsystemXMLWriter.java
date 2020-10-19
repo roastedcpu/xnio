@@ -171,7 +171,7 @@ public class InfinispanSubsystemXMLWriter implements XMLElementWriter<SubsystemM
                     writer.writeStartElement(XMLElement.REMOTE_CACHE_CONTAINER.getLocalName());
                     writer.writeAttribute(XMLAttribute.NAME.getLocalName(), remoteContainerName);
 
-                    writeAttributes(writer, remoteContainer, EnumSet.allOf(RemoteCacheContainerResourceDefinition.Attribute.class));
+                    writeAttributes(writer, remoteContainer, EnumSet.complementOf(EnumSet.of(RemoteCacheContainerResourceDefinition.Attribute.PROPERTIES)));
 
                     writeThreadPoolElements(XMLElement.ASYNC_THREAD_POOL, ThreadPoolResourceDefinition.CLIENT, writer, remoteContainer);
 
@@ -189,6 +189,8 @@ public class InfinispanSubsystemXMLWriter implements XMLElementWriter<SubsystemM
                         writeAttributes(writer, nearCache, EnumSet.allOf(InvalidationNearCacheResourceDefinition.Attribute.class));
                         writer.writeEndElement();
                     }
+
+                    writeElement(writer, remoteContainer, StoreResourceDefinition.Attribute.PROPERTIES);
 
                     writer.writeStartElement(XMLElement.REMOTE_CLUSTERS.getLocalName());
 

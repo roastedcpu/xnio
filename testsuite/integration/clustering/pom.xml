@@ -134,7 +134,7 @@
                         <executions>
                             <execution>
                                 <id>provision-infinispan-server</id>
-                                <phase>test-compile</phase>
+                                <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
@@ -142,6 +142,29 @@
                                     <config-file>infinispan-server-provisioning.xml</config-file>
                                     <buildName>${basedir}/target/</buildName>
                                     <server-name>infinispan-server-${version.org.infinispan}</server-name>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Patch infinispan server distribution, e.g. with authentication / users configuration. -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>ts.config-as.configure-users-infinispan-server</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/target/infinispan-server-${version.org.infinispan}/standalone/configuration</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/resources/infinispan-server</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                    <overwrite>true</overwrite>
                                 </configuration>
                             </execution>
                         </executions>
@@ -189,6 +212,26 @@
                                     <system-properties>
                                         <maven.repo.local>${settings.localRepository}</maven.repo.local>
                                         <module.path>${jboss.dist}/modules</module.path>
+                                    </system-properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>ts.config-as.configure-infinispan-server</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <offline>true</offline>
+                                    <scripts>
+                                        <script>clustering-infinispan-server.cli</script>
+                                    </scripts>
+                                    <jboss-home>${basedir}/target/infinispan-server-${version.org.infinispan}</jboss-home>
+                                    <stdout>${project.build.directory}/wildfly-plugin.log</stdout>
+                                    <java-opts>${modular.jdk.args}</java-opts>
+                                    <system-properties>
+                                        <maven.repo.local>${settings.localRepository}</maven.repo.local>
+                                        <module.path>${basedir}/target/infinispan-server-${version.org.infinispan}/modules</module.path>
                                     </system-properties>
                                 </configuration>
                             </execution>
