@@ -97,7 +97,6 @@ public class TracingDeploymentProcessor implements DeploymentUnitProcessor {
         String serviceName = getServiceName(deploymentUnit);
         ParamValueMetaData serviceNameContextParameter = getContextParam(jbossWebMetaData, SMALLRYE_OPENTRACING_SERVICE_NAME);
         serviceNameContextParameter.setParamValue(serviceName);
-        addResteasyProvidersParameter(jbossWebMetaData);
     }
 
     private JBossWebMetaData getJBossWebMetaData(DeploymentUnit deploymentUnit) {
