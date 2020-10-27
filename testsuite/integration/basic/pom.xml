@@ -448,6 +448,11 @@
             <artifactId>netty-all</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wildfly-jsf</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
