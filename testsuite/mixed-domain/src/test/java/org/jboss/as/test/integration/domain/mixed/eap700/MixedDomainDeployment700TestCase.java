@@ -25,6 +25,7 @@ package org.jboss.as.test.integration.domain.mixed.eap700;
 import org.jboss.as.test.integration.domain.mixed.MixedDomainDeploymentTest;
 import org.jboss.as.test.integration.domain.mixed.Version;
 import org.jboss.as.test.integration.domain.mixed.Version.AsVersion;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 /**
@@ -35,6 +36,10 @@ import org.junit.BeforeClass;
 public class MixedDomainDeployment700TestCase extends MixedDomainDeploymentTest {
     @BeforeClass
     public static void beforeClass() {
+        // WFLY-14022 -- 7.0.0.GA under certain JDK and Linux kernel versions expose ARTEMIS-2800
+        final String value = System.getProperty("ignore.ARTEMIS-2800");
+        Assume.assumeFalse(value != null && (value.isEmpty() || Boolean.parseBoolean(value)));
+
         MixedDomain700TestSuite.initializeDomain();
     }
 
