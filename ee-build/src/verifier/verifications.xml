@@ -29,6 +29,7 @@ limitations under the License.
     7) JBoss-Product-Release-Version key in manifest.mf has value starting with the value of the
        'verifier.product.release.version' property
     8) Various modules provided by the feature pack that provides the complete MicroProfile feature set are not present
+    9) Some verifications around libartemis-native-32.so / libartemis-native-64.so to ensure if the server distribution contains those artifacts, then the license file include those licenses as well.
 -->
   <files>
     <file>
@@ -106,6 +107,22 @@ limitations under the License.
     <file>
       <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/microprofile/org/wildfly/security/elytron-jwt/main</location>
       <exists>false</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-i686/libartemis-native-32.so</location>
+      <exists>true</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/docs/licenses/full-feature-pack-licenses.xml</location>
+      <contains>libartemis-native-32</contains>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/modules/system/layers/base/org/apache/activemq/artemis/journal/main/lib/linux-x86_64/libartemis-native-64.so</location>
+      <exists>true</exists>
+    </file>
+    <file>
+      <location>target/${server.output.dir.prefix}-${server.output.dir.version}/docs/licenses/full-feature-pack-licenses.xml</location>
+      <contains>libartemis-native-64</contains>
     </file>
   </files>
 </verifications>
