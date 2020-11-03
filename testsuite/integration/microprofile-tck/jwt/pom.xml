@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.jboss.eap</groupId>
         <artifactId>wildfly-ts-integ-mp</artifactId>
-        <version>7.3.4.GA-redhat-SNAPSHOT</version>
+        <version>7.3.5.GA-redhat-SNAPSHOT</version>
     </parent>
 
     <artifactId>wildfly-ts-integ-mp-jwt</artifactId>
