@@ -81,12 +81,13 @@ public class HealthReporterService implements Service<HealthReporter> {
 
     @Override
     public void start(StartContext context) {
-        healthReporter = new HealthReporter(emptyLivenessChecksStatus, emptyReadinessChecksStatus);
+        // MicroProfile Health supports the mp.health.disable-default-procedures to let users disable any vendor procedures
+        final boolean defaultServerProceduresDisabled = ConfigProvider.getConfig().getOptionalValue("mp.health.disable-default-procedures", Boolean.class).orElse(false);
+        healthReporter = new HealthReporter(emptyLivenessChecksStatus, emptyReadinessChecksStatus, defaultServerProceduresDisabled);
 
         modelControllerClient = modelControllerClientFactory.get().createClient(managementExecutor.get());
 
-        // MicroProfile Health supports the mp.health.disable-default-procedures to let users disable any vendor procedures
-        if (!ConfigProvider.getConfig().getOptionalValue("mp.health.disable-default-procedures", Boolean.class).orElse(false)) {
+        if (!defaultServerProceduresDisabled) {
             healthReporter.addServerReadinessCheck(new ServerStateCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());
             healthReporter.addServerReadinessCheck(new NoBootErrorsCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());
             healthReporter.addServerReadinessCheck(new DeploymentsStatusCheck(modelControllerClient), Thread.currentThread().getContextClassLoader());

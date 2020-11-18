@@ -33,7 +33,6 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import io.smallrye.health.SmallRyeHealth;
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
@@ -44,64 +43,81 @@ public class HealthReporter {
 
     public static final String DOWN = "DOWN";
     public static final String UP = "UP";
-    private final Boolean serverReadinessChecksDisabled;
+    private final boolean defaultServerProceduresDisabled;
     private Map<HealthCheck, ClassLoader> healthChecks = new HashMap<>();
     private Map<HealthCheck, ClassLoader> livenessChecks = new HashMap<>();
     private Map<HealthCheck, ClassLoader> readinessChecks = new HashMap<>();
     private Map<HealthCheck, ClassLoader> serverReadinessChecks = new HashMap<>();
 
-    private final String emptyLivenessChecksStatus;
-    private final String emptyReadinessChecksStatus;
+    private final HealthCheck emptyDeploymentLivenessCheck;
+    private final HealthCheck emptyDeploymentReadinessCheck;
 
-    public HealthReporter(String emptyLivenessChecksStatus, String emptyReadinessChecksStatus) {
-        this.emptyLivenessChecksStatus = emptyLivenessChecksStatus;
-        this.emptyReadinessChecksStatus = emptyReadinessChecksStatus;
-        this.serverReadinessChecksDisabled = ConfigProvider.getConfig().getOptionalValue("mp.health.disable-default-procedures", Boolean.class).orElse(false);
+    private static class EmptyDeploymentCheckStatus implements HealthCheck {
+        private final String name;
+        private final String status;
+
+        EmptyDeploymentCheckStatus(String name, String status) {
+            this.name = name;
+            this.status = status;
+        }
+
+        @Override
+        public HealthCheckResponse call() {
+            return HealthCheckResponse.named(name)
+                    .state(status.equals("UP"))
+                    .build();
+        }
+    }
+
+
+    public HealthReporter(String emptyLivenessChecksStatus, String emptyReadinessChecksStatus, boolean defaultServerProceduresDisabled) {
+        this.emptyDeploymentLivenessCheck  = new EmptyDeploymentCheckStatus("empty-liveness-checks", emptyLivenessChecksStatus);
+        this.emptyDeploymentReadinessCheck  = new EmptyDeploymentCheckStatus("empty-readiness-checks", emptyReadinessChecksStatus);
+        this.defaultServerProceduresDisabled = defaultServerProceduresDisabled;
     }
 
     public SmallRyeHealth getHealth() {
-        String emptyChecksStatus = DOWN.equals(emptyLivenessChecksStatus) || DOWN.equals(emptyReadinessChecksStatus) ? DOWN : UP;
-        return getHealth(emptyChecksStatus, serverReadinessChecks, healthChecks, livenessChecks, readinessChecks);
+        HashMap<HealthCheck, ClassLoader> deploymentChecks = new HashMap<>();
+        deploymentChecks.putAll(healthChecks);
+        deploymentChecks.putAll(livenessChecks);
+        deploymentChecks.putAll(readinessChecks);
+
+        HashMap<HealthCheck, ClassLoader> serverChecks= new HashMap<>();
+        serverChecks.putAll(serverReadinessChecks);
+        if (deploymentChecks.size() == 0 && !defaultServerProceduresDisabled) {
+            serverChecks.put(emptyDeploymentLivenessCheck, Thread.currentThread().getContextClassLoader());
+            serverChecks.put(emptyDeploymentReadinessCheck, Thread.currentThread().getContextClassLoader());
+        }
+
+        return getHealth(serverChecks, deploymentChecks);
     }
 
     public SmallRyeHealth getLiveness() {
-        return getHealth(emptyLivenessChecksStatus, Collections.emptyMap(), livenessChecks);
+        final Map<HealthCheck, ClassLoader> serverChecks;
+        if (livenessChecks.size() == 0 && !defaultServerProceduresDisabled) {
+            serverChecks = Collections.singletonMap(emptyDeploymentLivenessCheck, Thread.currentThread().getContextClassLoader());
+        } else {
+            serverChecks = Collections.emptyMap();
+        }
+        return getHealth(serverChecks, livenessChecks);
     }
 
     public SmallRyeHealth getReadiness() {
-        return getHealth(emptyReadinessChecksStatus, serverReadinessChecks, readinessChecks);
+        final Map<HealthCheck, ClassLoader> serverChecks = new HashMap<>();
+        serverChecks.putAll(serverReadinessChecks);
+        if (readinessChecks.size() == 0 && !defaultServerProceduresDisabled) {
+            serverChecks.put(emptyDeploymentReadinessCheck, Thread.currentThread().getContextClassLoader());
+        }
+        return getHealth(serverChecks, readinessChecks);
     }
 
-
-    @SafeVarargs
-    private final SmallRyeHealth getHealth(String emptyChecksStatus, Map<HealthCheck, ClassLoader> serverChecks, Map<HealthCheck, ClassLoader>... deploymentChecks) {
+    private final SmallRyeHealth getHealth(Map<HealthCheck, ClassLoader> serverChecks, Map<HealthCheck, ClassLoader> deploymentChecks) {
         JsonArrayBuilder results = Json.createArrayBuilder();
         HealthCheckResponse.State status = HealthCheckResponse.State.UP;
 
-        if (serverChecks != null) {
-            status = processChecks(serverChecks, results, status);
-        }
-        boolean emptyDeploymentChecks = true;
-        if (deploymentChecks != null) {
-            if (deploymentChecks.length != 0) {
-                emptyDeploymentChecks = false;
-            }
-            for (Map<HealthCheck, ClassLoader> entry : deploymentChecks) {
-                status = processChecks(entry, results, status);
-            }
-        }
+        status = processChecks(serverChecks, results, status);
 
-        // if there were no deployment checks
-        if (emptyDeploymentChecks && serverReadinessChecksDisabled) {
-            status = processChecks(Collections.singletonMap(new HealthCheck() {
-                @Override
-                public HealthCheckResponse call() {
-                    return HealthCheckResponse.named("empty-deployment-readiness-checks")
-                            .state(emptyChecksStatus.equals("UP"))
-                            .build();
-                }
-            }, Thread.currentThread().getContextClassLoader()), results, status);
-        }
+        status = processChecks(deploymentChecks, results, status);
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
