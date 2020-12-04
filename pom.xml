@@ -378,7 +378,7 @@
         <version.org.jboss.arquillian.core>1.4.0.Final</version.org.jboss.arquillian.core>
         <version.org.jboss.arquillian.testng>1.1.13.Final</version.org.jboss.arquillian.testng>
         <version.org.jboss.common.jboss-common-beans>2.0.1.Final-redhat-00001</version.org.jboss.common.jboss-common-beans>
-        <version.org.jboss.ejb-client>4.0.33.SP1-redhat-00001</version.org.jboss.ejb-client>
+        <version.org.jboss.ejb-client>4.0.37.Final-redhat-00001</version.org.jboss.ejb-client>
         <version.org.jboss.ejb-client-legacy>3.0.3.Final-redhat-00001</version.org.jboss.ejb-client-legacy>
         <version.org.jboss.ejb3.ext-api>2.3.0.Final-redhat-00001</version.org.jboss.ejb3.ext-api>
         <version.org.jboss.genericjms>2.0.6.Final-redhat-00001</version.org.jboss.genericjms>
