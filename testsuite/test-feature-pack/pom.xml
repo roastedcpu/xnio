@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.jboss.eap</groupId>
         <artifactId>jboss-eap-parent</artifactId>
-        <version>7.3.4.GA-redhat-SNAPSHOT</version>
+        <version>7.3.5.GA-redhat-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
