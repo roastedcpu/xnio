@@ -110,7 +110,8 @@ class OldVersionCopier {
     private Path expandAsInstance(Version.AsVersion version) {
         createIfNotExists(targetOldVersions);
 
-        Path file = oldVersionsBaseDir.resolve(version.getZipFileName());
+        final String path = resolveZipFileName(version);
+        Path file = oldVersionsBaseDir.resolve(path);
         if (Files.notExists(file)) {
             throw new RuntimeException("Old version not found in " + file.toAbsolutePath().toString());
         }
@@ -216,6 +217,14 @@ class OldVersionCopier {
 
         }
         return result;
+    }
+
+    private static String resolveZipFileName(final Version.AsVersion requested) {
+        final String value = System.getProperty("override.mixed.domain." + requested.getVersion());
+        if (value != null) {
+            return value;
+        }
+        return requested.getZipFileName();
     }
 
 }
