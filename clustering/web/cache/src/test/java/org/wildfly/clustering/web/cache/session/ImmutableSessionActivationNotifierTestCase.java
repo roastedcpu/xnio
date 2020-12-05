@@ -71,18 +71,88 @@ public class ImmutableSessionActivationNotifierTestCase {
     }
 
     @Test
-    public void prePassivate() {
+    public void test() {
         String sessionId = "abc";
         when(this.session.getId()).thenReturn(sessionId);
 
         ArgumentCaptor<HttpSessionEvent> capturedEvent = ArgumentCaptor.forClass(HttpSessionEvent.class);
 
+        // verify pre-passivate before post-activate is a no-op
+        this.notifier.prePassivate();
+
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+        verify(this.listener2, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+
+        for (HttpSessionEvent event : capturedEvent.getAllValues()) {
+            Assert.assertSame(this.context, event.getSession().getServletContext());
+            Assert.assertSame(sessionId, event.getSession().getId());
+        }
+
+        // verify initial post-activate
+        this.notifier.postActivate();
+
+        verify(this.listener1, Mockito.times(1)).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.times(1)).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+        verify(this.listener2, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+
+        for (HttpSessionEvent event : capturedEvent.getAllValues()) {
+            Assert.assertSame(this.context, event.getSession().getServletContext());
+            Assert.assertSame(sessionId, event.getSession().getId());
+        }
+
+        reset(this.listener1, this.listener2);
+
+        // verify subsequent post-activate is a no-op
+        this.notifier.postActivate();
+
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+        verify(this.listener2, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+
+        for (HttpSessionEvent event : capturedEvent.getAllValues()) {
+            Assert.assertSame(this.context, event.getSession().getServletContext());
+            Assert.assertSame(sessionId, event.getSession().getId());
+        }
+
+        // verify pre-passivate following post-activate
         this.notifier.prePassivate();
 
         verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
         verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
         verify(this.listener1, Mockito.times(1)).sessionWillPassivate(capturedEvent.capture());
         verify(this.listener2, Mockito.times(1)).sessionWillPassivate(capturedEvent.capture());
+
+        for (HttpSessionEvent event : capturedEvent.getAllValues()) {
+            Assert.assertSame(this.context, event.getSession().getServletContext());
+            Assert.assertSame(sessionId, event.getSession().getId());
+        }
+
+        reset(this.listener1, this.listener2);
+
+        // verify subsequent pre-passivate is a no-op
+        this.notifier.prePassivate();
+
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+        verify(this.listener2, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+
+        for (HttpSessionEvent event : capturedEvent.getAllValues()) {
+            Assert.assertSame(this.context, event.getSession().getServletContext());
+            Assert.assertSame(sessionId, event.getSession().getId());
+        }
+
+        // verify post-activate following pre-passivate
+        this.notifier.postActivate();
+
+        verify(this.listener1, Mockito.times(1)).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.times(1)).sessionDidActivate(capturedEvent.capture());
+        verify(this.listener1, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
+        verify(this.listener2, Mockito.never()).sessionWillPassivate(capturedEvent.capture());
 
         for (HttpSessionEvent event : capturedEvent.getAllValues()) {
             Assert.assertSame(this.context, event.getSession().getServletContext());

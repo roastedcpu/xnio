@@ -23,6 +23,8 @@
 package org.wildfly.clustering.web.cache.session;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSessionActivationListener;
@@ -37,6 +39,7 @@ import org.wildfly.clustering.web.session.ImmutableSession;
 public class ImmutableSessionActivationNotifier implements SessionActivationNotifier {
 
     private final FilteringHttpSession session;
+    private final AtomicBoolean active = new AtomicBoolean(false);
 
     public ImmutableSessionActivationNotifier(ImmutableSession session, ServletContext context) {
         this.session = new ImmutableFilteringHttpSession(session, context);
@@ -44,22 +47,24 @@ public class ImmutableSessionActivationNotifier implements SessionActivationNoti
 
     @Override
     public void prePassivate() {
-        Map<String, HttpSessionActivationListener> listeners = this.session.getAttributes(HttpSessionActivationListener.class);
-        if (!listeners.isEmpty()) {
-            HttpSessionEvent event = new HttpSessionEvent(this.session);
-            for (HttpSessionActivationListener listener : listeners.values()) {
-                listener.sessionWillPassivate(event);
-            }
+        if (this.active.compareAndSet(true, false)) {
+            this.notify(HttpSessionActivationListener::sessionWillPassivate);
         }
     }
 
     @Override
     public void postActivate() {
+        if (this.active.compareAndSet(false, true)) {
+            this.notify(HttpSessionActivationListener::sessionDidActivate);
+        }
+    }
+
+    private void notify(BiConsumer<HttpSessionActivationListener, HttpSessionEvent> notifier) {
         Map<String, HttpSessionActivationListener> listeners = this.session.getAttributes(HttpSessionActivationListener.class);
         if (!listeners.isEmpty()) {
             HttpSessionEvent event = new HttpSessionEvent(this.session);
             for (HttpSessionActivationListener listener : listeners.values()) {
-                listener.sessionDidActivate(event);
+                notifier.accept(listener, event);
             }
         }
     }

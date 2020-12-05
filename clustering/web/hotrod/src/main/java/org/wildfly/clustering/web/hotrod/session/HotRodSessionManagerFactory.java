@@ -28,6 +28,7 @@ import javax.servlet.ServletContext;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.wildfly.clustering.Registrar;
 import org.wildfly.clustering.ee.Batcher;
+import org.wildfly.clustering.ee.cache.ConcurrentManager;
 import org.wildfly.clustering.ee.cache.tx.TransactionBatch;
 import org.wildfly.clustering.ee.hotrod.tx.HotRodBatcher;
 import org.wildfly.clustering.marshalling.spi.Marshallability;
@@ -35,6 +36,7 @@ import org.wildfly.clustering.marshalling.spi.MarshalledValue;
 import org.wildfly.clustering.web.IdentifierFactory;
 import org.wildfly.clustering.web.cache.session.CompositeSessionFactory;
 import org.wildfly.clustering.web.cache.session.CompositeSessionMetaDataEntry;
+import org.wildfly.clustering.web.cache.session.ConcurrentSessionManager;
 import org.wildfly.clustering.web.cache.session.MarshalledValueSessionAttributesFactoryConfiguration;
 import org.wildfly.clustering.web.cache.session.Scheduler;
 import org.wildfly.clustering.web.cache.session.SessionAttributesFactory;
@@ -107,7 +109,7 @@ public class HotRodSessionManagerFactory<L, C extends Marshallability> implement
                 return HotRodSessionManagerFactory.this.transactionTimeout;
             }
         };
-        return new HotRodSessionManager<>(this.sessionFactory, config);
+        return new ConcurrentSessionManager<>(new HotRodSessionManager<>(this.sessionFactory, config), ConcurrentManager::new);
     }
 
     @Override

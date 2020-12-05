@@ -90,8 +90,7 @@ public class CoarseSessionAttributesFactory<V> implements SessionAttributesFacto
 
     @Override
     public SessionAttributes createSessionAttributes(String id, Map<String, Object> values, ImmutableSessionMetaData metaData, ServletContext context) {
-        ImmutableSessionAttributes attributes = this.createImmutableSessionAttributes(id, values);
-        SessionActivationNotifier notifier = new ImmutableSessionActivationNotifier(new CompositeImmutableSession(id, metaData, attributes), context);
+        SessionActivationNotifier notifier = this.properties.isPersistent() ? new ImmutableSessionActivationNotifier(new CompositeImmutableSession(id, metaData, this.createImmutableSessionAttributes(id, values)), context) : null;
         Mutator mutator = this.mutatorFactory.createMutator(new SessionAttributesKey(id), this.marshaller.write(values));
         return new CoarseSessionAttributes(values, mutator, this.marshaller, this.immutability, this.properties, notifier);
     }
