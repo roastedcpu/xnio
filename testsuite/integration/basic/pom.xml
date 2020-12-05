@@ -1189,7 +1189,7 @@
                                     <install-dir>${project.build.directory}/wildfly</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1228,7 +1228,7 @@
                                     <install-dir>${project.build.directory}/wildfly-jdr</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1267,7 +1267,7 @@
                                     <install-dir>${project.build.directory}/wildfly-legacy-security</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1307,7 +1307,7 @@
                                     <install-dir>${project.build.directory}/wildfly-jpa</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1347,7 +1347,7 @@
                                     <install-dir>${project.build.directory}/wildfly-ejb-lite</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1386,7 +1386,7 @@
                                     <install-dir>${project.build.directory}/wildfly-ejb</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1427,7 +1427,7 @@
                                     <install-dir>${project.build.directory}/wildfly-ejb3-embedded-broker</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1468,7 +1468,7 @@
                                     <install-dir>${project.build.directory}/wildfly-ejb3-remote-broker</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1510,7 +1510,7 @@
                                     <install-dir>${project.build.directory}/wildfly-jsf</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1549,7 +1549,7 @@
                                     <install-dir>${project.build.directory}/wildfly-jsf-ejb-lite</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1589,7 +1589,7 @@
                                     <install-dir>${project.build.directory}/wildfly-web-console</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
@@ -1628,7 +1628,7 @@
                                     <install-dir>${project.build.directory}/wildfly-web-console-cloud</install-dir>
                                     <record-state>false</record-state>
                                     <log-time>${galleon.log.time}</log-time>
-                                    <offline>true</offline>
+                                    <offline>${galleon.offline}</offline>
                                     <plugin-options>
                                         <jboss-maven-dist/>
                                         <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
