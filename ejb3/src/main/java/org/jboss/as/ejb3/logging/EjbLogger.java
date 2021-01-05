@@ -3223,4 +3223,11 @@ public interface EjbLogger extends BasicLogger {
     // use message id 521 to keep consistence with upstream
     @Message(id = 521, value = "Some classes referenced by annotation: %s in class: %s are missing.")
     DeploymentUnitProcessingException missingClassInAnnotation(String anCls, String resCls);
+
+    @LogMessage(level = WARN)
+    @Message(id = 523, value = "Timer %s has not been deployed")
+    void timerNotDeployed(String timer);
+
+    @Message(id = 524, value = "Timer %s cannot be added")
+    RuntimeException timerCannotBeAdded(TimerImpl timer);
 }
