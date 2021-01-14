@@ -38,6 +38,7 @@ import org.jboss.msc.value.ImmediateValue;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
 import java.util.Hashtable;
 
 import static org.jboss.as.naming.util.NamingUtils.isLastComponentEmpty;
@@ -154,7 +155,7 @@ public class WritableServiceBasedNamingStore extends ServiceBasedNamingStore imp
         return new NamingContext(name, WritableServiceBasedNamingStore.this, new Hashtable<String, Object>());
     }
 
-    private Object requireOwner() {
+    private Object requireOwner() throws OperationNotSupportedException {
         final Object owner = WRITE_OWNER.peek();
         if (owner == null) {
             throw NamingLogger.ROOT_LOGGER.readOnlyNamingContext();
