@@ -478,6 +478,18 @@
            <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-model-test</artifactId>
         </dependency>
+        <!-- Guava and failureaccess are required by wildfly-model-test. These can be removed when guava is upgraded
+         in wildfly-core and failureaccess dependency is added there. -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.wildfly.core</groupId>
             <artifactId>wildfly-core-model-test-framework</artifactId>
