@@ -383,7 +383,7 @@
         <version.org.jboss.ejb-client-legacy>3.0.3.Final-redhat-00001</version.org.jboss.ejb-client-legacy>
         <version.org.jboss.ejb3.ext-api>2.3.0.Final-redhat-00001</version.org.jboss.ejb3.ext-api>
         <version.org.jboss.genericjms>2.0.8.Final-redhat-00001</version.org.jboss.genericjms>
-        <version.org.jboss.hal.console>3.2.12.Final-redhat-00001</version.org.jboss.hal.console>
+        <version.org.jboss.hal.console>3.2.13.Final-redhat-00001</version.org.jboss.hal.console>
         <version.org.jboss.iiop-client>1.0.1.Final-redhat-1</version.org.jboss.iiop-client>
         <version.org.jboss.ironjacamar>1.4.22.Final-redhat-00001</version.org.jboss.ironjacamar>
         <version.org.jboss.jboss-transaction-spi>7.6.0.Final-redhat-1</version.org.jboss.jboss-transaction-spi>
