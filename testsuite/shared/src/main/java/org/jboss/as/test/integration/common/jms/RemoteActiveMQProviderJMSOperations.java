@@ -191,6 +191,20 @@ public class RemoteActiveMQProviderJMSOperations implements JMSOperations {
     }
 
     @Override
+    public void addCoreBridge(String name, ModelNode attributes) {
+        ModelNode address = getServerAddress();
+        address.add("bridge", name);
+        executeOperation(address, ADD, attributes);
+    }
+
+    @Override
+    public void removeCoreBridge(String name) {
+        ModelNode address = getServerAddress();
+        address.add("bridge", name);
+        executeOperation(address, REMOVE_OPERATION, null);
+    }
+
+    @Override
     public void addCoreQueue(String queueName, String queueAddress, boolean durable, String routing) {
         ModelNode address = getServerAddress()
                 .add("queue", queueName);
