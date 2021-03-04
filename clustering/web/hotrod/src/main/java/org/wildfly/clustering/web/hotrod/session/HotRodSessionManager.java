@@ -144,7 +144,7 @@ public class HotRodSessionManager<MV, AV, L> implements SessionManager<L, Transa
     }
 
     @Override
-    public ImmutableSession viewSession(String id) {
+    public ImmutableSession readSession(String id) {
         Map.Entry<MV, AV> entry = this.factory.findValue(id);
         return (entry != null) ? new SimpleImmutableSession(this.factory.createImmutableSession(id, entry)) : null;
     }
