@@ -28,12 +28,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
 
@@ -42,12 +42,12 @@ import io.undertow.server.session.SessionConfig;
 import io.undertow.server.session.SessionListener;
 import io.undertow.server.session.SessionListeners;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.wildfly.clustering.ee.Batch;
 import org.wildfly.clustering.ee.Batcher;
 import org.wildfly.clustering.web.session.ImmutableSession;
-import org.wildfly.clustering.web.session.ImmutableSessionAttributes;
 import org.wildfly.clustering.web.session.ImmutableSessionMetaData;
 import org.wildfly.clustering.web.session.Session;
 import org.wildfly.clustering.web.session.SessionManager;
@@ -308,56 +308,38 @@ public class DistributableSessionManagerTestCase {
         Batcher<Batch> batcher = mock(Batcher.class);
         Batch batch = mock(Batch.class);
         ImmutableSession session = mock(ImmutableSession.class);
-        ImmutableSessionAttributes attributes = mock(ImmutableSessionAttributes.class);
         ImmutableSessionMetaData metaData = mock(ImmutableSessionMetaData.class);
-        String id = "session";
-        String name = "name";
-        Object value = new Object();
-        Set<String> names = Collections.singleton(name);
-        Instant creationTime = Instant.now();
-        Instant lastAccessedTime = Instant.now();
-        Duration maxInactiveInterval = Duration.ofMinutes(30L);
+        String id = "ABC123";
 
         when(this.manager.getBatcher()).thenReturn(batcher);
-        when(this.manager.readSession(id)).thenReturn(session);
-        when(session.getId()).thenReturn(id);
-        when(session.getAttributes()).thenReturn(attributes);
-        when(attributes.getAttributeNames()).thenReturn(names);
-        when(attributes.getAttribute(name)).thenReturn(value);
-        when(session.getMetaData()).thenReturn(metaData);
-        when(metaData.getCreationTime()).thenReturn(creationTime);
-        when(metaData.getLastAccessedTime()).thenReturn(lastAccessedTime);
-        when(metaData.getMaxInactiveInterval()).thenReturn(maxInactiveInterval);
         when(batcher.createBatch()).thenReturn(batch);
+        when(this.manager.readSession(id)).thenReturn(session);
+        when(session.getMetaData()).thenReturn(metaData);
+        when(metaData.isNew()).thenReturn(false);
 
         io.undertow.server.session.Session result = this.adapter.getSession(id);
 
-        assertSame(this.adapter, result.getSessionManager());
-        assertSame(id, result.getId());
-        assertEquals(creationTime.toEpochMilli(), result.getCreationTime());
-        assertEquals(lastAccessedTime.toEpochMilli(), result.getLastAccessedTime());
-        assertEquals(maxInactiveInterval.getSeconds(), result.getMaxInactiveInterval());
-        assertEquals(names, result.getAttributeNames());
-        assertSame(value, result.getAttribute(name));
+        Assert.assertSame(id, result.getId());
 
         verify(batch).close();
     }
 
     @Test
     public void getSessionByIdentifierNotExists() {
-        String id = "session";
         Batcher<Batch> batcher = mock(Batcher.class);
         Batch batch = mock(Batch.class);
+        String id = "ABC123";
 
         when(this.manager.getBatcher()).thenReturn(batcher);
-        when(this.manager.readSession(id)).thenReturn(null);
         when(batcher.createBatch()).thenReturn(batch);
+        when(this.manager.readSession(id)).thenReturn(null);
 
         io.undertow.server.session.Session result = this.adapter.getSession(id);
 
-        assertNull(result);
+        Assert.assertNull(result);
 
         verify(batch).close();
+        reset(batch);
     }
 
     @Test
