@@ -28,7 +28,8 @@ import java.util.List;
 
 import org.wildfly.clustering.web.LocalContextFactory;
 
-public class LocalSessionContextFactory implements LocalContextFactory<LocalSessionContext> {
+public enum LocalSessionContextFactory implements LocalContextFactory<LocalSessionContext> {
+    INSTANCE;
 
     @Override
     public LocalSessionContext createLocalContext() {

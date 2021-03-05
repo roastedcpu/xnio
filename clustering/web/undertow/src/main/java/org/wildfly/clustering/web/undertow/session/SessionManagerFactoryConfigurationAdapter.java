@@ -49,7 +49,6 @@ public class SessionManagerFactoryConfigurationAdapter extends WebDeploymentConf
     private final Integer maxActiveSessions;
     private final MarshallingContext context;
     private final MarshalledValueFactory<MarshallingContext> marshalledValueFactory;
-    private final LocalContextFactory<LocalSessionContext> localContextFactory = new LocalSessionContextFactory();
     private final Immutability immutability;
 
     public SessionManagerFactoryConfigurationAdapter(SessionManagerFactoryConfiguration configuration, Immutability immutability) {
@@ -79,7 +78,7 @@ public class SessionManagerFactoryConfigurationAdapter extends WebDeploymentConf
 
     @Override
     public LocalContextFactory<LocalSessionContext> getLocalContextFactory() {
-        return this.localContextFactory;
+        return LocalSessionContextFactory.INSTANCE;
     }
 
     @Override
