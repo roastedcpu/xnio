@@ -30,12 +30,12 @@ import io.undertow.websockets.core.WebSocketChannel;
 
 import java.time.Duration;
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.function.Consumer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,12 +62,32 @@ public class DistributableSession implements io.undertow.server.session.Session 
     private final Consumer<HttpServerExchange> closeTask;
 
     private volatile Map.Entry<Session<LocalSessionContext>, SessionConfig> entry;
+    // The following references are only used to create an OOB session
+    private volatile String id = null;
+    private volatile LocalSessionContext localContext = null;
 
     public DistributableSession(UndertowSessionManager manager, Session<LocalSessionContext> session, SessionConfig config, Batch batch, Consumer<HttpServerExchange> closeTask) {
         this.manager = manager;
+        this.id = session.getId();
         this.entry = new SimpleImmutableEntry<>(session, config);
         this.batch = batch;
         this.closeTask = closeTask;
+    }
+
+    private Map.Entry<Session<LocalSessionContext>, SessionConfig> getSessionEntry() {
+        Map.Entry<Session<LocalSessionContext>, SessionConfig> entry = this.entry;
+        // If entry is null, we are outside of the context of a request
+        if (entry == null) {
+            // Only allow a single thread to lazily create OOB session
+            synchronized (this) {
+                if (this.entry == null) {
+                    // N.B. If entry is null, id and localContext will already have been set
+                    this.entry = new SimpleImmutableEntry<>(new OOBSession<>(this.manager.getSessionManager(), this.id, this.localContext), new SimpleSessionConfig(this.id));
+                }
+                entry = this.entry;
+            }
+        }
+        return entry;
     }
 
     @Override
@@ -78,7 +98,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
     @Override
     public void requestDone(HttpServerExchange exchange) {
         try {
-            Session<LocalSessionContext> session = this.entry.getKey();
+            Session<LocalSessionContext> session = this.getSessionEntry().getKey();
             if (session.isValid()) {
                 Batcher<Batch> batcher = this.manager.getSessionManager().getBatcher();
                 try (BatchContext context = batcher.resumeBatch(this.batch)) {
@@ -90,9 +110,11 @@ public class DistributableSession implements io.undertow.server.session.Session 
                     try (Batch batch = (this.batch.getState() == Batch.State.CLOSED) ? batcher.createBatch() : this.batch) {
                         session.close();
                     } finally {
-                        // In case the session is referenced after the request, switch to an OOB session
-                        String id = session.getId();
-                        this.entry = new SimpleImmutableEntry<>(new OOBSession<>(this.manager.getSessionManager(), id, session.getLocalContext()), new SimpleSessionConfig(id));
+                        // Deference the distributed session, but retain reference to session identifier and local context
+                        // If session is accessed after this method, getSessionEntry() will lazily create an OOB session
+                        this.id = session.getId();
+                        this.localContext = session.getLocalContext();
+                        this.entry = null;
                     }
                 } catch (Throwable e) {
                     // Don't propagate exceptions at the stage, since response was already committed
@@ -112,12 +134,13 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public String getId() {
-        return this.entry.getKey().getId();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
+        return session.getId();
     }
 
     @Override
     public long getCreationTime() {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getMetaData().getCreationTime().toEpochMilli();
@@ -126,7 +149,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public long getLastAccessedTime() {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getMetaData().getLastAccessedTime().toEpochMilli();
@@ -135,7 +158,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public int getMaxInactiveInterval() {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return (int) session.getMetaData().getMaxInactiveInterval().getSeconds();
@@ -144,7 +167,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public void setMaxInactiveInterval(int interval) {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             session.getMetaData().setMaxInactiveInterval(Duration.ofSeconds(interval));
@@ -153,7 +176,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public Set<String> getAttributeNames() {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getAttributes().getAttributeNames();
@@ -162,7 +185,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public Object getAttribute(String name) {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
@@ -181,7 +204,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
         if (value == null) {
             return this.removeAttribute(name);
         }
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
@@ -205,7 +228,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public Object removeAttribute(String name) {
-        Session<LocalSessionContext> session = this.entry.getKey();
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
         this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
@@ -225,7 +248,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public void invalidate(HttpServerExchange exchange) {
-        Map.Entry<Session<LocalSessionContext>, SessionConfig> entry = this.entry;
+        Map.Entry<Session<LocalSessionContext>, SessionConfig> entry = this.getSessionEntry();
         Session<LocalSessionContext> session = entry.getKey();
         this.validate(exchange, session);
         // Invoke listeners outside of the context of the batch associated with this session
@@ -253,7 +276,7 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public String changeSessionId(HttpServerExchange exchange, SessionConfig config) {
-        Session<LocalSessionContext> oldSession = this.entry.getKey();
+        Session<LocalSessionContext> oldSession = this.getSessionEntry().getKey();
         this.validate(exchange, oldSession);
         SessionManager<LocalSessionContext, Batch> manager = this.manager.getSessionManager();
         String id = manager.createIdentifier();
