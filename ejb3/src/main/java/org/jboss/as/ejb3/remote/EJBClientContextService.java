@@ -169,6 +169,7 @@ public final class EJBClientContextService implements Service<EJBClientContextSe
     }
 
     public void stop(final StopContext context) {
+        clientContext.close();
         clientContext = null;
         if (makeGlobal) {
             doPrivileged((PrivilegedAction<Void>) () -> {
