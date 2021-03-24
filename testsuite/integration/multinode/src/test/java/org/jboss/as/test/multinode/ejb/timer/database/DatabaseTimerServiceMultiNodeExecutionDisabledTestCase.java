@@ -202,7 +202,7 @@ public class DatabaseTimerServiceMultiNodeExecutionDisabledTestCase {
     }
 
 
-    public Context getRemoteContext(ManagementClient managementClient) throws Exception {
+    public static Context getRemoteContext(ManagementClient managementClient) throws Exception {
         final Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, org.jboss.naming.remote.client.InitialContextFactory.class.getName());
         URI webUri = managementClient.getWebUri();
