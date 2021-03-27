@@ -69,6 +69,10 @@ public interface JMSOperations {
 
     void removeJmsBridge(String name);
 
+    void addCoreBridge(String name, ModelNode attributes);
+
+    void removeCoreBridge(String name);
+
     void addCoreQueue(final String queueName, final String queueAddress, boolean durable, String routing);
 
     void removeCoreQueue(final String queueName);

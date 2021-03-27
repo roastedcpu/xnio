@@ -868,4 +868,7 @@ public interface MessagingLogger extends BasicLogger {
     @LogMessage(level = WARN)
     @Message(id = 101, value = "Invalid value %s for %s, legal values are %s, default value is applied.")
     void invalidTransactionNameValue(String value, String name, Collection<?> validValues);
+
+    @Message(id = 103, value = "Broker is not started. It cannot be managed yet.")
+    IllegalStateException brokerNotStarted();
 }
