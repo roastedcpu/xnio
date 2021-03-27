@@ -652,32 +652,6 @@ public class DistributableSessionTestCase {
     }
 
     @Test
-    public void invalidateWhenResponseDone() {
-        HttpServerExchange exchange = new HttpServerExchange(null);
-        this.validate(exchange, session -> session.invalidate(exchange));
-
-        SessionManager<LocalSessionContext, Batch> manager = mock(SessionManager.class);
-        Batcher<Batch> batcher = mock(Batcher.class);
-        BatchContext context = mock(BatchContext.class);
-        SessionListener listener = mock(SessionListener.class);
-        SessionListeners listeners = new SessionListeners();
-        listeners.addSessionListener(listener);
-        String sessionId = "session";
-
-        when(this.manager.getSessionListeners()).thenReturn(listeners);
-        when(this.session.getId()).thenReturn(sessionId);
-        when(this.manager.getSessionManager()).thenReturn(manager);
-        when(manager.getBatcher()).thenReturn(batcher);
-        when(batcher.resumeBatch(this.batch)).thenReturn(context);
-        when(this.batch.getState()).thenReturn(Batch.State.CLOSED);
-
-        // ISA expected
-        this.exception.expect(IllegalStateException.class);
-        this.exception.expectMessage("WFLYCLWEBUT0009");
-        this.adapter.invalidate(exchange);
-    }
-
-    @Test
     public void getSessionManager() {
         assertSame(this.manager, this.adapter.getSessionManager());
     }
