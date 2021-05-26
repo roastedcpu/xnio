@@ -1,12 +1,17 @@
 Thanks for submitting your Pull Request!
 
-Pull Request desciription must have at the least following content:
+Pull Request description must have at the least following content:
 
 Upstream Issue: <TICKET>|Upstream not required
 [Upstream PR: <PR>]
 Issue: <TICKET>
 [Related Issues: <TICKET>,<TICKET>,....]
 
+You can use below keywords for exceptional case, but please provide a short description for release coordinator to understand why those are not applicable.
+
+No issue required (if EAP issue is not applicable).
+Upstream not required (if Upstream issue is not applicable).
+Upstream PR not required (if Upstream PR is not applicable).
 
 
 Also, it has to conform to following:
