@@ -3230,4 +3230,8 @@ public interface EjbLogger extends BasicLogger {
 
     @Message(id = 524, value = "Timer %s cannot be added")
     RuntimeException timerCannotBeAdded(TimerImpl timer);
+
+    @Message(id = 526, value = "Timer %s does not exist")
+    OperationFailedException timerNotFound(String timerId);
+
 }
