@@ -113,12 +113,13 @@ for /d %%a in ( "%JBOSS_HOME%\..\jbcs-jsvc-*" ) do (
 rem prunsrv.exe was not found above, so try to find it under JBOSS_HOME\bin.
 if "%PRUNSRV%" == "" (
   if exist "%JBOSS_HOME%\bin\prunsrv.exe" (
-    set PRUNSRV="%JBOSS_HOME%\bin\prunsrv.exe"
+    set "PRUNSRV=%JBOSS_HOME%\bin\prunsrv.exe"
   ) else (
     echo Please install native utilities into expected location %JBOSS_HOME%\..\jbcs-jsvc-1.1
     goto cmdEnd
   )
 )
+set PRUNSRV="%PRUNSRV%"
 
 if "%DEBUG%" == "1" (
 	echo PRUNSRV %PRUNSRV%
