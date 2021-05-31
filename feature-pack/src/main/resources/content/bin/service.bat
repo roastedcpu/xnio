@@ -461,11 +461,11 @@ if not "%JBOSSUSER%" == "" (
 
 set RUNAS=
 if not "%SERVICE_USER%" == "" (
-  if "%SERVICE_PASS%" == "" (
+  if "!SERVICE_PASS!" == "" (
     echo When specifying a user, you need to specify the password
     goto endBatch
   )
-  set RUNAS=--ServiceUser="%SERVICE_USER%" --ServicePassword="%SERVICE_PASS%"
+  set RUNAS=--ServiceUser="%SERVICE_USER%" --ServicePassword="!SERVICE_PASS!"
 )
 
 if "%STDOUT%"=="" set STDOUT=auto
@@ -504,7 +504,7 @@ if not exist "%BASE%\configuration\%CONFIG%" (
 
 if /I "%ISDEBUG%" == "true" (
   echo JBOSS_HOME="%JBOSS_HOME%"
-  echo RUNAS=%RUNAS%
+  echo RUNAS=!RUNAS!
   echo SHORTNAME="%SHORTNAME%"
   echo DESCRIPTION="%DESCRIPTION%"
   echo STARTPARAM=%STARTPARAM%
@@ -526,10 +526,10 @@ if /I "%ISDEBUG%" == "true" (
 )
 
 @rem quotes around the "%DESCRIPTION%" but nowhere else
-echo %PRUNSRV% install %SHORTNAME% %RUNAS% --DisplayName=%DISPLAYNAME% --Description="%DESCRIPTION%" --LogLevel=%LOGLEVEL% --LogPath=%LOGPATH% --LogPrefix=service --StdOutput=%STDOUT% --StdError=%STDERR% --StartMode=exe --Startup=%STARTUP_MODE% --StartImage=cmd.exe --StartPath=%START_PATH% ++StartParams=%STARTPARAM% --StopMode=exe --StopImage=cmd.exe --StopPath=%STOP_PATH%  ++StopParams=%STOPPARAM%
+echo %PRUNSRV% install %SHORTNAME% !RUNAS! --DisplayName=%DISPLAYNAME% --Description="%DESCRIPTION%" --LogLevel=%LOGLEVEL% --LogPath=%LOGPATH% --LogPrefix=service --StdOutput=%STDOUT% --StdError=%STDERR% --StartMode=exe --Startup=%STARTUP_MODE% --StartImage=cmd.exe --StartPath=%START_PATH% ++StartParams=%STARTPARAM% --StopMode=exe --StopImage=cmd.exe --StopPath=%STOP_PATH%  ++StopParams=%STOPPARAM%
 
-%PRUNSRV% install %SHORTNAME% %RUNAS% --DisplayName=%DISPLAYNAME% --Description="%DESCRIPTION%" --LogLevel=%LOGLEVEL% --LogPath=%LOGPATH% --LogPrefix=service --StdOutput=%STDOUT% --StdError=%STDERR% --StartMode=exe --Startup=%STARTUP_MODE% --StartImage=cmd.exe --StartPath=%START_PATH% ++StartParams=%STARTPARAM% --StopMode=exe --StopImage=cmd.exe --StopPath=%STOP_PATH%  ++StopParams=%STOPPARAM%
-@rem %PRUNSRV% install "%SHORTNAME%" "%RUNAS%" --DisplayName="%DISPLAYNAME%" --Description="%DESCRIPTION%" --LogLevel="%LOGLEVEL%" --LogPath="%LOGPATH%" --LogPrefix=service --StdOutput="%STDOUT%" --StdError="%STDERR%" --StartMode=exe --Startup="%STARTUP_MODE%" --StartImage=cmd.exe --StartPath="%START_PATH%" ++StartParams="%STARTPARAM%" --StopMode=exe --StopImage=cmd.exe --StopPath="%STOP_PATH%"  ++StopParams="%STOPPARAM%"
+%PRUNSRV% install %SHORTNAME% !RUNAS! --DisplayName=%DISPLAYNAME% --Description="%DESCRIPTION%" --LogLevel=%LOGLEVEL% --LogPath=%LOGPATH% --LogPrefix=service --StdOutput=%STDOUT% --StdError=%STDERR% --StartMode=exe --Startup=%STARTUP_MODE% --StartImage=cmd.exe --StartPath=%START_PATH% ++StartParams=%STARTPARAM% --StopMode=exe --StopImage=cmd.exe --StopPath=%STOP_PATH%  ++StopParams=%STOPPARAM%
+@rem %PRUNSRV% install "%SHORTNAME%" "!RUNAS!" --DisplayName="%DISPLAYNAME%" --Description="%DESCRIPTION%" --LogLevel="%LOGLEVEL%" --LogPath="%LOGPATH%" --LogPrefix=service --StdOutput="%STDOUT%" --StdError="%STDERR%" --StartMode=exe --Startup="%STARTUP_MODE%" --StartImage=cmd.exe --StartPath="%START_PATH%" ++StartParams="%STARTPARAM%" --StopMode=exe --StopImage=cmd.exe --StopPath="%STOP_PATH%"  ++StopParams="%STOPPARAM%"
 
 @if /I "%ISDEBUG%" == "true" (
   @echo off
