@@ -73,12 +73,17 @@ import org.jboss.dmr.ModelType;
 
 public class MetricCollector {
 
+    private static final ModelNode UNDEFINED = new ModelNode();
 
     private final boolean exposeAnySubsystem;
     private String globalPrefix;
     private final List<String> exposedSubsystems;
     private final LocalModelControllerClient modelControllerClient;
     private final ProcessStateNotifier processStateNotifier;
+
+    static {
+        UNDEFINED.protect();
+    }
 
     public MetricCollector(LocalModelControllerClient modelControllerClient, ProcessStateNotifier processStateNotifier, List<String> exposedSubsystems, String globalPrefix) {
         this.modelControllerClient = modelControllerClient;
@@ -321,12 +326,19 @@ public class MetricCollector {
         final ModelNode readAttributeOp = new ModelNode();
         readAttributeOp.get(OP).set(READ_ATTRIBUTE_OPERATION);
         readAttributeOp.get(OP_ADDR).set(address.toModelNode());
-        readAttributeOp.get(ModelDescriptionConstants.INCLUDE_UNDEFINED_METRIC_VALUES).set(true);
+        readAttributeOp.get(ModelDescriptionConstants.INCLUDE_UNDEFINED_METRIC_VALUES).set(false);
         readAttributeOp.get(NAME).set(attributeName);
         ModelNode response = modelControllerClient.execute(readAttributeOp);
         String error = getFailureDescription(response);
         if (error != null) {
-            throw LOGGER.unableToReadAttribute(attributeName, address, error);
+            // [WFLY-11933] if the value can not be read if the management resource is not accessible due to RBAC,
+            // it is logged it at a lower level.
+            if (error.contains("WFLYCTL0216")) {
+                LOGGER.debugf("Unable to read attribute %s: %s.", attributeName, error);
+            } else{
+                LOGGER.unableToReadAttribute(attributeName, address, error);
+            }
+            return UNDEFINED;
         }
         return  response.get(RESULT);
     }
