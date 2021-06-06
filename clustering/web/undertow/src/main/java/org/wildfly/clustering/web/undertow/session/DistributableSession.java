@@ -97,37 +97,27 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public void requestDone(HttpServerExchange exchange) {
-        try {
-            Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-            if (session.isValid()) {
-                Batcher<Batch> batcher = this.manager.getSessionManager().getBatcher();
-                try (BatchContext context = batcher.resumeBatch(this.batch)) {
-                    // If batch was discarded, close it
-                    if (this.batch.getState() == Batch.State.DISCARDED) {
-                        this.batch.close();
-                    }
-                    // If batch is closed, close session in a new batch
-                    try (Batch batch = (this.batch.getState() == Batch.State.CLOSED) ? batcher.createBatch() : this.batch) {
-                        session.close();
-                    } finally {
-                        // Deference the distributed session, but retain reference to session identifier and local context
-                        // If session is accessed after this method, getSessionEntry() will lazily create an OOB session
-                        this.id = session.getId();
-                        this.localContext = session.getLocalContext();
-                        this.entry = null;
-                    }
-                } catch (Throwable e) {
-                    // Don't propagate exceptions at the stage, since response was already committed
-                    UndertowClusteringLogger.ROOT_LOGGER.warn(e.getLocalizedMessage(), e);
-                }
-            } else if (this.batch.getState() != Batch.State.CLOSED) {
-                Batcher<Batch> batcher = this.manager.getSessionManager().getBatcher();
-                try (BatchContext context = batcher.resumeBatch(this.batch)) {
-                    // Ensure batch is closed.
-                    this.batch.close();
-                }
+        Session<LocalSessionContext> session = this.getSessionEntry().getKey();
+        Batcher<Batch> batcher = this.manager.getSessionManager().getBatcher();
+        try (BatchContext context = batcher.resumeBatch(this.batch)) {
+            // If batch was discarded, close it
+            if (this.batch.getState() == Batch.State.DISCARDED) {
+                this.batch.close();
             }
+            // If batch is closed, close valid session in a new batch
+            try (Batch batch = (this.batch.getState() == Batch.State.CLOSED) && session.isValid() ? batcher.createBatch() : this.batch) {
+                // Ensure session is closed, even if invalid
+                session.close();
+            }
+        } catch (Throwable e) {
+            // Don't propagate exceptions at the stage, since response was already committed
+            UndertowClusteringLogger.ROOT_LOGGER.warn(e.getLocalizedMessage(), e);
         } finally {
+            // Dereference the distributed session, but retain reference to session identifier and local context
+            // If session is accessed after this method, getSessionEntry() will lazily create an OOB session
+            this.id = session.getId();
+            this.localContext = session.getLocalContext();
+            this.entry = null;
             this.closeTask.accept(exchange);
         }
     }
@@ -141,52 +131,61 @@ public class DistributableSession implements io.undertow.server.session.Session 
     @Override
     public long getCreationTime() {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getMetaData().getCreationTime().toEpochMilli();
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public long getLastAccessedTime() {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getMetaData().getLastAccessedTime().toEpochMilli();
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public int getMaxInactiveInterval() {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return (int) session.getMetaData().getMaxInactiveInterval().getSeconds();
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public void setMaxInactiveInterval(int interval) {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             session.getMetaData().setMaxInactiveInterval(Duration.ofSeconds(interval));
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public Set<String> getAttributeNames() {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             return session.getAttributes().getAttributeNames();
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public Object getAttribute(String name) {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
                 AuthenticatedSession auth = (AuthenticatedSession) session.getAttributes().getAttribute(name);
@@ -196,6 +195,9 @@ public class DistributableSession implements io.undertow.server.session.Session 
                 return session.getLocalContext().getWebSocketChannels();
             }
             return session.getAttributes().getAttribute(name);
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
@@ -205,7 +207,6 @@ public class DistributableSession implements io.undertow.server.session.Session 
             return this.removeAttribute(name);
         }
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
                 AuthenticatedSession auth = (AuthenticatedSession) value;
@@ -223,13 +224,15 @@ public class DistributableSession implements io.undertow.server.session.Session 
                 this.manager.getSessionListeners().attributeUpdated(this, name, value, old);
             }
             return old;
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public Object removeAttribute(String name) {
         Session<LocalSessionContext> session = this.getSessionEntry().getKey();
-        this.validate(session);
         try (BatchContext context = this.resumeBatch()) {
             if (CachedAuthenticatedSessionHandler.ATTRIBUTE_NAME.equals(name)) {
                 AuthenticatedSession auth = (AuthenticatedSession) session.getAttributes().removeAttribute(name);
@@ -243,23 +246,28 @@ public class DistributableSession implements io.undertow.server.session.Session 
                 this.manager.getSessionListeners().attributeRemoved(this, name, old);
             }
             return old;
+        } catch (IllegalStateException e) {
+            this.closeIfInvalid(null, session);
+            throw e;
         }
     }
 
     @Override
     public void invalidate(HttpServerExchange exchange) {
         Map.Entry<Session<LocalSessionContext>, SessionConfig> entry = this.getSessionEntry();
+        @SuppressWarnings("resource")
         Session<LocalSessionContext> session = entry.getKey();
-        this.validate(exchange, session);
-        // Invoke listeners outside of the context of the batch associated with this session
-        this.manager.getSessionListeners().sessionDestroyed(this, exchange, SessionDestroyedReason.INVALIDATED);
-        try (BatchContext context = this.resumeBatch()) {
+        if (session.isValid()) {
+            // Invoke listeners outside of the context of the batch associated with this session
             // Trigger attribute listeners
             ImmutableSessionAttributes attributes = session.getAttributes();
             for (String name : attributes.getAttributeNames()) {
                 Object value = attributes.getAttribute(name);
                 this.manager.getSessionListeners().attributeRemoved(this, name, value);
             }
+            this.manager.getSessionListeners().sessionDestroyed(this, exchange, SessionDestroyedReason.INVALIDATED);
+        }
+        try (BatchContext context = this.resumeBatch()) {
             session.invalidate();
             if (exchange != null) {
                 String id = session.getId();
@@ -269,6 +277,12 @@ public class DistributableSession implements io.undertow.server.session.Session 
             if (this.batch != null) {
                 this.batch.close();
             }
+        } catch (IllegalStateException e) {
+            // If Session.invalidate() fails due to concurrent invalidation, close this session
+            if (!session.isValid()) {
+                session.close();
+            }
+            throw e;
         } finally {
             this.closeTask.accept(exchange);
         }
@@ -277,23 +291,31 @@ public class DistributableSession implements io.undertow.server.session.Session 
     @Override
     public String changeSessionId(HttpServerExchange exchange, SessionConfig config) {
         Session<LocalSessionContext> oldSession = this.getSessionEntry().getKey();
-        this.validate(exchange, oldSession);
         SessionManager<LocalSessionContext, Batch> manager = this.manager.getSessionManager();
         String id = manager.createIdentifier();
         try (BatchContext context = this.resumeBatch()) {
             Session<LocalSessionContext> newSession = manager.createSession(id);
-            for (String name: oldSession.getAttributes().getAttributeNames()) {
-                newSession.getAttributes().setAttribute(name, oldSession.getAttributes().getAttribute(name));
+            try {
+                for (String name: oldSession.getAttributes().getAttributeNames()) {
+                    newSession.getAttributes().setAttribute(name, oldSession.getAttributes().getAttribute(name));
+                }
+                newSession.getMetaData().setMaxInactiveInterval(oldSession.getMetaData().getMaxInactiveInterval());
+                newSession.getMetaData().setLastAccessedTime(oldSession.getMetaData().getLastAccessedTime());
+                newSession.getLocalContext().setAuthenticatedSession(oldSession.getLocalContext().getAuthenticatedSession());
+                newSession.getLocalContext().setWebSocketChannels(oldSession.getLocalContext().getWebSocketChannels());
+                oldSession.invalidate();
+                config.setSessionId(exchange, id);
+                this.entry = new SimpleImmutableEntry<>(newSession, config);
+            } catch (IllegalStateException e) {
+                this.closeIfInvalid(exchange, oldSession);
+                newSession.invalidate();
+                throw e;
             }
-            newSession.getMetaData().setMaxInactiveInterval(oldSession.getMetaData().getMaxInactiveInterval());
-            newSession.getMetaData().setLastAccessedTime(oldSession.getMetaData().getLastAccessedTime());
-            newSession.getLocalContext().setAuthenticatedSession(oldSession.getLocalContext().getAuthenticatedSession());
-            config.setSessionId(exchange, id);
-            this.entry = new SimpleImmutableEntry<>(newSession, config);
-            oldSession.invalidate();
         }
-        // Invoke listeners outside of the context of the batch associated with this session
-        this.manager.getSessionListeners().sessionIdChanged(this, oldSession.getId());
+        if (!oldSession.isValid()) {
+            // Invoke listeners outside of the context of the batch associated with this session
+            this.manager.getSessionListeners().sessionIdChanged(this, oldSession.getId());
+        }
         return id;
     }
 
@@ -311,21 +333,20 @@ public class DistributableSession implements io.undertow.server.session.Session 
         return old;
     }
 
-    private void validate(Session<LocalSessionContext> session) {
-        this.validate(null, session);
-    }
-
-    private void validate(HttpServerExchange exchange, Session<LocalSessionContext> session) {
-        if (!session.isValid()) {
-            // Workaround for UNDERTOW-1402
-            // Ensure close task is run before throwing exception
-            this.closeTask.accept(exchange);
-            throw UndertowClusteringLogger.ROOT_LOGGER.sessionIsInvalid(session.getId());
-        }
-    }
-
     private BatchContext resumeBatch() {
         Batch batch = (this.batch != null) && (this.batch.getState() != Batch.State.CLOSED) ? this.batch : null;
         return this.manager.getSessionManager().getBatcher().resumeBatch(batch);
+    }
+
+    private void closeIfInvalid(HttpServerExchange exchange, Session<LocalSessionContext> session) {
+        if (!session.isValid()) {
+            // If session was invalidated by a concurrent request, Undertow will not trigger Session.requestDone(...), so we need to close the session here
+            try {
+                session.close();
+            } finally {
+                // Ensure close task is run
+                this.closeTask.accept(exchange);
+            }
+        }
     }
 }
