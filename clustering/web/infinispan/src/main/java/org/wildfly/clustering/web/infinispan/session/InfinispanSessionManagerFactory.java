@@ -24,13 +24,13 @@ package org.wildfly.clustering.web.infinispan.session;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,10 +43,9 @@ import org.infinispan.context.Flag;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.notifications.Listener;
-import org.infinispan.notifications.cachelistener.annotation.DataRehashed;
 import org.infinispan.notifications.cachelistener.annotation.TopologyChanged;
-import org.infinispan.notifications.cachelistener.event.DataRehashedEvent;
 import org.infinispan.notifications.cachelistener.event.TopologyChangedEvent;
+import org.infinispan.remoting.transport.Address;
 import org.jboss.threads.JBossThreadFactory;
 import org.wildfly.clustering.Registrar;
 import org.wildfly.clustering.dispatcher.CommandDispatcherFactory;
@@ -109,8 +108,7 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
     private final Scheduler expirationScheduler;
     private final SessionCreationMetaDataKeyFilter filter = new SessionCreationMetaDataKeyFilter();
     private final ExecutorService executor = Executors.newSingleThreadExecutor(createThreadFactory());
-    private final AtomicReference<Future<?>> rehashFuture = new AtomicReference<>();
-    private final AtomicInteger rehashTopology = new AtomicInteger();
+    private final AtomicReference<Future<?>> scheduleTaskFuture = new AtomicReference<>();
 
     public InfinispanSessionManagerFactory(InfinispanSessionManagerFactoryConfiguration<C, L> config) {
         this.affinityFactory = config.getKeyAffinityServiceFactory();
@@ -218,27 +216,23 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
         this.expirationScheduler.close();
     }
 
-    @DataRehashed
-    public void dataRehashed(DataRehashedEvent<Key<String>, ?> event) {
-        try {
-            if (event.isPre()) {
-                this.rehashTopology.set(event.getNewTopologyId());
-                this.cancel(event.getCache(), event.getConsistentHashAtEnd());
-            } else {
-                this.rehashTopology.compareAndSet(event.getNewTopologyId(), 0);
-                this.schedule(event.getCache(), event.getConsistentHashAtStart(), event.getConsistentHashAtEnd());
-            }
-        } catch (RejectedExecutionException e) {
-            // Executor was shutdown
-        }
-    }
-
     @TopologyChanged
     public void topologyChanged(TopologyChangedEvent<Key<String>, ?> event) {
-        if (!event.isPre()) {
-            // If this topology change has no corresponding rehash event, we must reschedule expirations as primary ownership may have changed
-            if (this.rehashTopology.get() != event.getNewTopologyId()) {
-                this.schedule(event.getCache(), event.getReadConsistentHashAtStart(), event.getWriteConsistentHashAtEnd());
+        Cache<Key<String>, ?> cache = event.getCache();
+        Address address = event.getCache().getCacheManager().getAddress();
+        ConsistentHash oldHash = event.getWriteConsistentHashAtStart();
+        Set<Integer> oldSegments = oldHash.getPrimarySegmentsForOwner(address);
+        ConsistentHash newHash = event.getWriteConsistentHashAtEnd();
+        Set<Integer> newSegments = newHash.getPrimarySegmentsForOwner(address);
+        if (event.isPre()) {
+            // If there are segments that we no longer own, then run cancellation task
+            if (!newSegments.containsAll(oldSegments)) {
+                this.cancel(cache, newHash);
+            }
+        } else {
+            // If we have newly owned segments, then run schedule task
+            if (!oldSegments.containsAll(newSegments)) {
+                this.schedule(cache, oldHash, newHash);
             }
         }
     }
@@ -246,48 +240,28 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
     private void cancel(Cache<Key<String>, ?> cache, ConsistentHash hash) {
         // For invalidation-caches, where all keys hash to a single member, retain local expiration scheduling
         if (cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer()) {
-            Future<?> future = this.rehashFuture.getAndSet(null);
+            Future<?> future = this.scheduleTaskFuture.getAndSet(null);
             if (future != null) {
                 future.cancel(true);
             }
-            this.executor.submit(new CancelExpirationTask(this.expirationScheduler, new ConsistentHashLocality(cache, hash)));
+            this.expirationScheduler.cancel(new ConsistentHashLocality(cache, hash));
         }
     }
 
     private void schedule(Cache<Key<String>, ?> cache, ConsistentHash startHash, ConsistentHash endHash) {
         // Skip session scheduling for Invalidation caches, if no members have left
         if (cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() || !endHash.getMembers().containsAll(startHash.getMembers())) {
-            // Skip expiration rescheduling if we do not own any segments
-            if (!endHash.getPrimarySegmentsForOwner(cache.getCacheManager().getAddress()).isEmpty()) {
-                Future<?> future = this.rehashFuture.getAndSet(null);
+            // For non-transactional invalidation-caches, where all keys hash to a single member, always schedule
+            Locality oldLocality = cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() ? new ConsistentHashLocality(cache, startHash) : new SimpleLocality(false);
+            Locality newLocality = new ConsistentHashLocality(cache, endHash);
+            try {
+                Future<?> future = this.scheduleTaskFuture.getAndSet(this.executor.submit(new ScheduleExpirationTask(cache, this.filter, this.expirationScheduler, oldLocality, newLocality)));
                 if (future != null) {
                     future.cancel(true);
                 }
-                // For non-transactional invalidation-caches, where all keys hash to a single member, always schedule
-                Locality oldLocality = cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() ? new ConsistentHashLocality(cache, startHash) : new SimpleLocality(false);
-                Locality newLocality = new ConsistentHashLocality(cache, endHash);
-                try {
-                    this.rehashFuture.compareAndSet(null, this.executor.submit(new ScheduleExpirationTask(cache, this.filter, this.expirationScheduler, oldLocality, newLocality)));
-                } catch (RejectedExecutionException e) {
-                    // Executor was shutdown
-                }
+            } catch (RejectedExecutionException e) {
+                // Executor was shutdown
             }
-        }
-    }
-
-    private static class CancelExpirationTask implements Runnable {
-        private final Scheduler scheduler;
-        private final Locality locality;
-
-        CancelExpirationTask(Scheduler scheduler, Locality locality) {
-            this.scheduler = scheduler;
-            this.locality = locality;
-        }
-
-        @Override
-        public void run() {
-            // Cancel local expiration of sessions we no longer own
-            this.scheduler.cancel(this.locality);
         }
     }
 

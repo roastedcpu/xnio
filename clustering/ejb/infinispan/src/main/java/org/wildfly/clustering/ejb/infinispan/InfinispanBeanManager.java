@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,7 +35,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -49,9 +49,7 @@ import org.infinispan.context.Flag;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.notifications.Listener;
-import org.infinispan.notifications.cachelistener.annotation.DataRehashed;
 import org.infinispan.notifications.cachelistener.annotation.TopologyChanged;
-import org.infinispan.notifications.cachelistener.event.DataRehashedEvent;
 import org.infinispan.notifications.cachelistener.event.TopologyChangedEvent;
 import org.infinispan.remoting.transport.Address;
 import org.jboss.ejb.client.Affinity;
@@ -119,8 +117,7 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
     private final PassivationConfiguration<T> passivation;
     private final Batcher<TransactionBatch> batcher;
     private final Predicate<Map.Entry<? super BeanKey<I>, ? super BeanEntry<I>>> filter;
-    private final AtomicReference<Future<?>> rehashFuture = new AtomicReference<>();
-    private final AtomicInteger rehashTopology = new AtomicInteger();
+    private final AtomicReference<Future<?>> scheduleTaskFuture = new AtomicReference<>();
     private final Group group;
     private final Function<BeanKey<I>, Node> primaryOwnerLocator;
 
@@ -156,7 +153,7 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
         List<Scheduler<I>> schedulers = new ArrayList<>(2);
         Duration timeout = this.expiration.getTimeout();
         if ((timeout != null) && !timeout.isNegative()) {
-            if (dispatcherFactory.getGroup().isSingleton()) {
+            if (this.dispatcherFactory.getGroup().isSingleton()) {
                 schedulers.add(new NonClusteredBeanExpirationScheduler<>(
                         this.batcher, this.beanFactory, this.expiration));
             } else {
@@ -171,7 +168,7 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
         if (idleTimeout != null) {
             Duration idleDuration = Duration.parse(idleTimeout);
             if (!idleDuration.isNegative()) {
-                if (dispatcherFactory.getGroup().isSingleton()) {
+                if (this.dispatcherFactory.getGroup().isSingleton()) {
                     schedulers.add(new NonClusteredEagerEvictionScheduler<>(
                             this.beanFactory, this.groupFactory, this.expiration.getExecutor(), idleDuration));
                 } else {
@@ -243,8 +240,8 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
 
     private void prepareRescheduling(I id) {
         if (this.dispatcher != null) {
-            if (dispatcherFactory.getGroup().isSingleton()) {
-                scheduler.prepareRescheduling(id);
+            if (this.dispatcherFactory.getGroup().isSingleton()) {
+                this.scheduler.prepareRescheduling(id);
                 return;
             }
             try {
@@ -257,8 +254,8 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
 
     void cancel(I id) {
         if (this.dispatcher != null) {
-            if (dispatcherFactory.getGroup().isSingleton()) {
-                scheduler.cancel(id);
+            if (this.dispatcherFactory.getGroup().isSingleton()) {
+                this.scheduler.cancel(id);
                 return;
             }
             try {
@@ -271,8 +268,8 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
 
     void schedule(I id, ImmutableBeanEntry<I> entry) {
         if (this.dispatcher != null) {
-            if (dispatcherFactory.getGroup().isSingleton()) {
-                scheduler.schedule(id);
+            if (this.dispatcherFactory.getGroup().isSingleton()) {
+                this.scheduler.schedule(id);
                 return;
             }
             try {
@@ -351,31 +348,23 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
         return this.groupFactory.getPassiveCount();
     }
 
-    @DataRehashed
-    public void dataRehashed(DataRehashedEvent<BeanKey<I>, BeanEntry<I>> event) {
-        if (this.dispatcher != null) {
-            try {
-                if (event.isPre()) {
-                    this.rehashTopology.set(event.getNewTopologyId());
-                    this.cancel(event.getCache(), event.getConsistentHashAtEnd());
-                } else {
-                    this.rehashTopology.compareAndSet(event.getNewTopologyId(), 0);
-                    this.schedule(event.getCache(), event.getConsistentHashAtStart(), event.getConsistentHashAtEnd());
-                }
-            } catch (RejectedExecutionException e) {
-                // Executor was shutdown
-            }
-        }
-    }
-
     @TopologyChanged
     public void topologyChanged(TopologyChangedEvent<BeanKey<I>, BeanEntry<I>> event) {
-        if (this.dispatcher != null) {
-            if (!event.isPre()) {
-                // If this topology change has no corresponding rehash event, we must reschedule expirations as primary ownership may have changed
-                if (this.rehashTopology.get() != event.getNewTopologyId()) {
-                    this.schedule(event.getCache(), event.getReadConsistentHashAtStart(), event.getWriteConsistentHashAtEnd());
-                }
+        Cache<BeanKey<I>, BeanEntry<I>> cache = event.getCache();
+        Address address = event.getCache().getCacheManager().getAddress();
+        ConsistentHash oldHash = event.getWriteConsistentHashAtStart();
+        Set<Integer> oldSegments = oldHash.getPrimarySegmentsForOwner(address);
+        ConsistentHash newHash = event.getWriteConsistentHashAtEnd();
+        Set<Integer> newSegments = newHash.getPrimarySegmentsForOwner(address);
+        if (event.isPre()) {
+            // If there are segments that we no longer own, then run cancellation task
+            if (!newSegments.containsAll(oldSegments)) {
+                this.cancel(cache, newHash);
+            }
+        } else {
+            // If we have newly owned segments, then run schedule task
+            if (!oldSegments.containsAll(newSegments)) {
+                this.schedule(cache, oldHash, newHash);
             }
         }
     }
@@ -383,47 +372,28 @@ public class InfinispanBeanManager<I, T> implements BeanManager<I, T, Transactio
     private void cancel(Cache<BeanKey<I>, BeanEntry<I>> cache, ConsistentHash hash) {
         // For invalidation-caches, where all keys hash to a single member, retain local expiration scheduling
         if (cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer()) {
-            Future<?> future = this.rehashFuture.getAndSet(null);
+            Future<?> future = this.scheduleTaskFuture.getAndSet(null);
             if (future != null) {
                 future.cancel(true);
             }
-            this.executor.submit(new CancelExpirationTask<>(this.scheduler, new ConsistentHashLocality(cache, hash)));
+            this.scheduler.cancel(new ConsistentHashLocality(cache, hash));
         }
     }
 
     private void schedule(Cache<BeanKey<I>, BeanEntry<I>> cache, ConsistentHash startHash, ConsistentHash endHash) {
-        // Skip bean scheduling for invalidation caches, if no members have left
+        // Skip session scheduling for Invalidation caches, if no members have left
         if (cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() || !endHash.getMembers().containsAll(startHash.getMembers())) {
-            // Skip expiration rescheduling if we do not own any segments
-            if (!endHash.getPrimarySegmentsForOwner(cache.getCacheManager().getAddress()).isEmpty()) {
-                Future<?> future = this.rehashFuture.getAndSet(null);
+            // For non-transactional invalidation-caches, where all keys hash to a single member, always schedule
+            Locality oldLocality = cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() ? new ConsistentHashLocality(cache, startHash) : new SimpleLocality(false);
+            Locality newLocality = new ConsistentHashLocality(cache, endHash);
+            try {
+                Future<?> future = this.scheduleTaskFuture.getAndSet(this.executor.submit(new ScheduleExpirationTask<>(cache, this.filter, this.scheduler, oldLocality, newLocality)));
                 if (future != null) {
                     future.cancel(true);
                 }
-                // For invalidation-caches, where all keys hash to a single member, always schedule
-                Locality oldLocality = cache.getCacheConfiguration().clustering().cacheMode().needsStateTransfer() ? new ConsistentHashLocality(cache, startHash) : new SimpleLocality(false);
-                Locality newLocality = new ConsistentHashLocality(cache, endHash);
-                try {
-                    this.rehashFuture.compareAndSet(null, this.executor.submit(new ScheduleExpirationTask<>(cache, this.filter, this.scheduler, oldLocality, newLocality)));
-                } catch (RejectedExecutionException e) {
-                    // Executor was shutdown
-                }
+            } catch (RejectedExecutionException e) {
+                // Executor was shutdown
             }
-        }
-    }
-
-    private static class CancelExpirationTask<I> implements Runnable {
-        private final Scheduler<I> scheduler;
-        private final Locality locality;
-
-        CancelExpirationTask(Scheduler<I> scheduler, Locality locality) {
-            this.scheduler = scheduler;
-            this.locality = locality;
-        }
-
-        @Override
-        public void run() {
-            this.scheduler.cancel(this.locality);
         }
     }
 
