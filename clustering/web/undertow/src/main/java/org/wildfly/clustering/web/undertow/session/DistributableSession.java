@@ -25,6 +25,7 @@ import io.undertow.security.api.AuthenticatedSessionManager.AuthenticatedSession
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.session.SessionConfig;
 import io.undertow.server.session.SessionListener.SessionDestroyedReason;
+import io.undertow.servlet.UndertowServletMessages;
 import io.undertow.servlet.handlers.security.CachedAuthenticatedSessionHandler;
 import io.undertow.websockets.core.WebSocketChannel;
 
@@ -276,6 +277,10 @@ public class DistributableSession implements io.undertow.server.session.Session 
 
     @Override
     public String changeSessionId(HttpServerExchange exchange, SessionConfig config) {
+        // Workaround for UNDERTOW-1902
+        if (exchange.isResponseStarted()) { // Should match the condition in io.undertow.servlet.spec.HttpServletResponseImpl#isCommitted()
+            throw UndertowServletMessages.MESSAGES.responseAlreadyCommited();
+        }
         Session<LocalSessionContext> oldSession = this.getSessionEntry().getKey();
         this.validate(exchange, oldSession);
         SessionManager<LocalSessionContext, Batch> manager = this.manager.getSessionManager();

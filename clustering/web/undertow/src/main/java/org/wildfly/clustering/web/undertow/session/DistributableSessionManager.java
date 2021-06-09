@@ -153,6 +153,13 @@ public class DistributableSessionManager implements UndertowSessionManager, Cons
         if (config == null) {
             throw UndertowMessages.MESSAGES.couldNotFindSessionCookieConfig();
         }
+        // Workaround for UNDERTOW-1902
+        if (exchange.isResponseStarted()) { // Should match the condition in io.undertow.servlet.spec.HttpServletResponseImpl#isCommitted()
+            // Return a single use session to be garbage collected at the end of the request
+            io.undertow.server.session.Session session = new OrphanSession(this, this.manager.createIdentifier());
+            session.setMaxInactiveInterval((int) this.manager.getDefaultMaxInactiveInterval().getSeconds());
+            return session;
+        }
 
         String requestedId = config.findSessionId(exchange);
 
