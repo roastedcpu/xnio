@@ -134,7 +134,7 @@ public class SessionExpirationScheduler<MV> implements Scheduler {
     public void close() {
         this.executor.shutdown();
         for (Future<?> future : this.expirationFutures.values()) {
-            future.cancel(true);
+            future.cancel(false);
         }
         for (Future<?> future : this.expirationFutures.values()) {
             if (!future.isDone()) {
