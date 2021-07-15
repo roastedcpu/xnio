@@ -22,6 +22,7 @@ package org.jboss.as.clustering.infinispan.subsystem;
 import java.util.function.Function;
 
 import org.infinispan.Cache;
+import org.infinispan.manager.EmbeddedCacheManager;
 import org.jboss.as.clustering.controller.BinaryCapabilityNameResolver;
 import org.jboss.as.clustering.controller.Metric;
 import org.jboss.as.clustering.controller.MetricExecutor;
@@ -29,7 +30,9 @@ import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceNotFoundException;
 import org.wildfly.clustering.infinispan.spi.InfinispanCacheRequirement;
+import org.wildfly.clustering.infinispan.spi.InfinispanRequirement;
 import org.wildfly.clustering.service.PassiveServiceSupplier;
 
 /**
@@ -49,9 +52,25 @@ public abstract class CacheMetricExecutor<C> implements MetricExecutor<C>, Funct
 
     @Override
     public ModelNode execute(OperationContext context, Metric<C> metric) throws OperationFailedException {
-        ServiceName name = InfinispanCacheRequirement.CACHE.getServiceName(context, this.resolver);
-        Cache<?, ?> cache = new PassiveServiceSupplier<Cache<?, ?>>(context.getServiceRegistry(false), name).get();
+        Cache<?, ?> cache = this.getCache(context);
         C metricContext = (cache != null) ? this.apply(cache) : null;
         return (metricContext != null) ? metric.execute(metricContext) : null;
+    }
+
+    private Cache<?, ?> getCache(OperationContext context) {
+        ServiceName cacheName = InfinispanCacheRequirement.CACHE.getServiceName(context, this.resolver);
+        try {
+            return new PassiveServiceSupplier<Cache<?, ?>>(context.getServiceRegistry(false), cacheName).get();
+        } catch (ServiceNotFoundException e) {
+            // If cache was created programmatically, no service will exist for this cache
+            // Obtain cache from cache manager service instead
+            ServiceName containerName = InfinispanRequirement.CONTAINER.getServiceName(context, cacheName.getParent().getSimpleName());
+            EmbeddedCacheManager manager = new PassiveServiceSupplier<EmbeddedCacheManager>(context.getServiceRegistry(false), containerName).get();
+            if (!manager.cacheExists(cacheName.getSimpleName())) {
+                // If cache does not exist, throw exception, lest we inadvertently create it.
+                throw e;
+            }
+            return manager.getCache(cacheName.getSimpleName());
+        }
     }
 }
