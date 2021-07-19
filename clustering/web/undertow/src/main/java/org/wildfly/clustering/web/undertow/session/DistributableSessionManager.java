@@ -53,7 +53,7 @@ import io.undertow.util.AttachmentKey;
  * Adapts a distributable {@link SessionManager} to an Undertow {@link io.undertow.server.session.SessionManager}.
  * @author Paul Ferraro
  */
-public class DistributableSessionManager implements UndertowSessionManager, Consumer<HttpServerExchange>, LongConsumer {
+public class DistributableSessionManager implements UndertowSessionManager, LongConsumer {
 
     private static final IdentifierSerializer IDENTIFIER_SERIALIZER = new UndertowIdentifierSerializerProvider().getSerializer();
 
@@ -139,13 +139,6 @@ public class DistributableSessionManager implements UndertowSessionManager, Cons
                 }
             }
         };
-    }
-
-    @Override
-    public void accept(HttpServerExchange exchange) {
-        if (exchange != null) {
-            exchange.removeAttachment(this.key);
-        }
     }
 
     @Override
