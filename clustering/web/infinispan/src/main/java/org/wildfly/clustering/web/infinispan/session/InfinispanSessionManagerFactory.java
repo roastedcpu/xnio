@@ -22,6 +22,7 @@
 package org.wildfly.clustering.web.infinispan.session;
 
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -221,9 +222,9 @@ public class InfinispanSessionManagerFactory<C extends Marshallability, L> imple
         Cache<Key<String>, ?> cache = event.getCache();
         Address address = event.getCache().getCacheManager().getAddress();
         ConsistentHash oldHash = event.getWriteConsistentHashAtStart();
-        Set<Integer> oldSegments = oldHash.getPrimarySegmentsForOwner(address);
+        Set<Integer> oldSegments = oldHash.getMembers().contains(address) ? oldHash.getPrimarySegmentsForOwner(address) : Collections.emptySet();
         ConsistentHash newHash = event.getWriteConsistentHashAtEnd();
-        Set<Integer> newSegments = newHash.getPrimarySegmentsForOwner(address);
+        Set<Integer> newSegments = newHash.getMembers().contains(address) ? newHash.getPrimarySegmentsForOwner(address) : Collections.emptySet();
         if (event.isPre()) {
             // If there are segments that we no longer own, then run cancellation task
             if (!newSegments.containsAll(oldSegments)) {
