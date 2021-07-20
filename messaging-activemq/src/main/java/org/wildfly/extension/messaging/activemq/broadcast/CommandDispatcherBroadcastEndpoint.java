@@ -24,8 +24,10 @@ package org.wildfly.extension.messaging.activemq.broadcast;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.apache.activemq.artemis.api.core.BroadcastEndpoint;
+import org.wildfly.clustering.Registration;
 import org.wildfly.clustering.dispatcher.CommandDispatcher;
 import org.wildfly.clustering.dispatcher.CommandDispatcherFactory;
 
@@ -41,20 +43,26 @@ public class CommandDispatcherBroadcastEndpoint implements BroadcastEndpoint {
 
     private final CommandDispatcherFactory factory;
     private final String name;
-    private final BroadcastManager manager;
+    private final BroadcastReceiverRegistrar registrar;
+    private final Supplier<BroadcastManager> managerFactory;
     private final AtomicReference<Mode> mode = new AtomicReference<>(Mode.CLOSED);
 
+    private volatile BroadcastManager manager = null;
+    private volatile Registration registration = null;
     private volatile CommandDispatcher<BroadcastReceiver> dispatcher;
 
-    public CommandDispatcherBroadcastEndpoint(CommandDispatcherFactory factory, String name, BroadcastManager manager) {
+    public CommandDispatcherBroadcastEndpoint(CommandDispatcherFactory factory, String name, BroadcastReceiverRegistrar registrar, Supplier<BroadcastManager> managerFactory) {
         this.factory = factory;
         this.name = name;
-        this.manager = manager;
+        this.registrar = registrar;
+        this.managerFactory = managerFactory;
     }
 
     @Override
     public void openClient() throws Exception {
         if (this.mode.compareAndSet(Mode.CLOSED, Mode.RECEIVER)) {
+            this.manager = this.managerFactory.get();
+            this.registration = this.registrar.register(this.manager);
             this.open();
         }
     }
@@ -67,14 +75,21 @@ public class CommandDispatcherBroadcastEndpoint implements BroadcastEndpoint {
     }
 
     private void open() throws Exception {
-        this.dispatcher = this.factory.createCommandDispatcher(this.name, this.manager);
+        this.dispatcher = this.factory.createCommandDispatcher(this.name, this.registrar);
     }
 
     @Override
     public void close(boolean isBroadcast) throws Exception {
         if (this.mode.getAndSet(Mode.CLOSED) != Mode.CLOSED) {
-            this.dispatcher.close();
-            this.manager.clear();
+            if (this.dispatcher != null) {
+                this.dispatcher.close();
+            }
+            if (this.registration != null) {
+                this.registration.close();
+            }
+            if (this.manager != null) {
+                this.manager.clear();
+            }
         }
     }
 

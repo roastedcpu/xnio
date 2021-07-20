@@ -52,8 +52,8 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
-import org.wildfly.clustering.dispatcher.CommandDispatcherFactory;
 import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
+import org.wildfly.extension.messaging.activemq.broadcast.BroadcastCommandDispatcherFactory;
 import org.wildfly.extension.messaging.activemq.broadcast.CommandDispatcherBroadcastEndpointFactory;
 import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
 
@@ -188,7 +188,7 @@ public class BroadcastGroupAdd extends AbstractAddStepHandler {
                 .setEndpointFactory(endpointFactory);
     }
 
-    static BroadcastGroupConfiguration createBroadcastGroupConfiguration(final String name, final BroadcastGroupConfiguration config, final CommandDispatcherFactory commandDispatcherFactory, final String channelName) throws Exception {
+    static BroadcastGroupConfiguration createBroadcastGroupConfiguration(final String name, final BroadcastGroupConfiguration config, final BroadcastCommandDispatcherFactory commandDispatcherFactory, final String channelName) throws Exception {
 
         final long broadcastPeriod = config.getBroadcastPeriod();
         final List<String> connectorRefs = config.getConnectorInfos();
