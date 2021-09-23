@@ -320,7 +320,7 @@
         <version.jaxen>1.1.6.redhat-2</version.jaxen>
         <version.jboss.jaxbintros>1.0.3.GA-redhat-00001</version.jboss.jaxbintros>
         <version.joda-time>2.9.7.redhat-1</version.joda-time>
-        <version.jsoup>1.8.3.redhat-2</version.jsoup>
+        <version.jsoup>1.14.2.redhat-00002</version.jsoup>
         <version.net.jcip>1.0.0.redhat-8</version.net.jcip>
         <version.net.shibboleth.utilities.java-support>7.3.0.redhat-00001</version.net.shibboleth.utilities.java-support>
         <version.org.apache.activemq.artemis>2.9.0.redhat-00019</version.org.apache.activemq.artemis>
