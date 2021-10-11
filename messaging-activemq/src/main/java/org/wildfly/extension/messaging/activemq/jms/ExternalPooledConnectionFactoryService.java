@@ -105,9 +105,6 @@ import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.wildfly.clustering.dispatcher.CommandDispatcherFactory;
-import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
-import org.wildfly.clustering.spi.ClusteringRequirement;
 import org.wildfly.common.function.ExceptionSupplier;
 import org.wildfly.extension.messaging.activemq.ActiveMQResourceAdapter;
 import org.wildfly.extension.messaging.activemq.DiscoveryGroupAdd;
@@ -116,6 +113,7 @@ import org.wildfly.extension.messaging.activemq.GroupBindingService;
 import org.wildfly.extension.messaging.activemq.MessagingExtension;
 import org.wildfly.extension.messaging.activemq.MessagingServices;
 import org.wildfly.extension.messaging.activemq.TransportConfigOperationHandlers;
+import org.wildfly.extension.messaging.activemq.broadcast.BroadcastCommandDispatcherFactory;
 import org.wildfly.extension.messaging.activemq.broadcast.CommandDispatcherBroadcastEndpointFactory;
 import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
 import org.wildfly.security.credential.PasswordCredential;
@@ -169,7 +167,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
     // mapping between the {discovery}-groups and the cluster names they use
     private final Map<String, String> clusterNames = new HashMap<>();
     // mapping between the {discovery}-groups and the command dispatcher factory they use
-    private final Map<String, Supplier<CommandDispatcherFactory>> commandDispatcherFactories = new HashMap<>();
+    private final Map<String, Supplier<BroadcastCommandDispatcherFactory>> commandDispatcherFactories = new HashMap<>();
     private BindInfo bindInfo;
     private List<String> jndiAliases;
     private String txSupport;
@@ -241,7 +239,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
                 connectors, groupConfiguration, jgroupClusterName, jgroupChannelName, adapterParams,
                 bindInfo, jndiAliases, txSupport, minPoolSize, maxPoolSize, managedConnectionPoolClassName, enlistmentTrace,
                 capabilityServiceSupport, false);
-        ServiceBuilder serviceBuilder = serviceTarget.addService(serviceName);
+        ServiceBuilder<?> serviceBuilder = serviceTarget.addService(serviceName);
         installService0(serviceBuilder, configuration, service, groupConfiguration, connectorsSocketBindings, capabilityServiceSupport);
         return service;
     }
@@ -277,10 +275,10 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
             DiscoveryGroupConfiguration groupConfiguration,
             Set<String> connectorsSocketBindings,
             ModelNode model) throws OperationFailedException {
-        ServiceBuilder serviceBuilder = context.getServiceTarget().addService(serviceName);
+        ServiceBuilder<?> serviceBuilder = context.getServiceTarget().addService(serviceName);
         serviceBuilder.requires(context.getCapabilityServiceName(MessagingServices.LOCAL_TRANSACTION_PROVIDER_CAPABILITY, null));
-       // ensures that Artemis client thread pools are not stopped before any deployment depending on a pooled-connection-factory
-       serviceBuilder.requires(MessagingServices.ACTIVEMQ_CLIENT_THREAD_POOL);
+        // ensures that Artemis client thread pools are not stopped before any deployment depending on a pooled-connection-factory
+        serviceBuilder.requires(MessagingServices.ACTIVEMQ_CLIENT_THREAD_POOL);
         ModelNode credentialReference = ConnectionFactoryAttributes.Pooled.CREDENTIAL_REFERENCE.resolveModelAttribute(context, model);
         if (credentialReference.isDefined()) {
             service.credentialSourceSupplier = CredentialReference.getCredentialSourceSupplier(context, ConnectionFactoryAttributes.Pooled.CREDENTIAL_REFERENCE, model, serviceBuilder);
@@ -301,8 +299,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
         if (groupConfiguration != null) {
             final String key = "discovery" + groupConfiguration.getName();
             if (service.jgroupsClusterName != null) {
-                ServiceName commandDispatcherFactoryServiceName = service.jgroupsChannelName != null ? ClusteringRequirement.COMMAND_DISPATCHER_FACTORY.getServiceName(context, service.jgroupsChannelName) : ClusteringDefaultRequirement.COMMAND_DISPATCHER_FACTORY.getServiceName(context);
-                Supplier<CommandDispatcherFactory> commandDispatcherFactorySupplier = serviceBuilder.requires(commandDispatcherFactoryServiceName);
+                Supplier<BroadcastCommandDispatcherFactory> commandDispatcherFactorySupplier = serviceBuilder.requires(MessagingServices.getBroadcastCommandDispatcherFactoryServiceName(service.jgroupsChannelName));
                 service.commandDispatcherFactories.put(key, commandDispatcherFactorySupplier);
                 service.clusterNames.put(key, service.jgroupsClusterName);
             } else {
@@ -315,7 +312,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
         serviceBuilder.install();
     }
 
-    private static void installService0(ServiceBuilder serviceBuilder,
+    private static void installService0(ServiceBuilder<?> serviceBuilder,
             ExternalBrokerConfigurationService configuration,
             ExternalPooledConnectionFactoryService service,
             DiscoveryGroupConfiguration groupConfiguration,
@@ -338,7 +335,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
         if (groupConfiguration != null) {
             final String key = "discovery" + groupConfiguration.getName();
             if (service.jgroupsClusterName != null) {
-                Supplier<CommandDispatcherFactory> commandDispatcherFactorySupplier = serviceBuilder.requires(configuration.getCommandDispatcherFactories().get(key));
+                Supplier<BroadcastCommandDispatcherFactory> commandDispatcherFactorySupplier = serviceBuilder.requires(configuration.getCommandDispatcherFactories().get(key));
                 service.commandDispatcherFactories.put(key, commandDispatcherFactorySupplier);
                 service.clusterNames.put(key, service.jgroupsClusterName);
             } else {
@@ -408,7 +405,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
                 final String key = "discovery" + dgName;
                 final DiscoveryGroupConfiguration config;
                 if (commandDispatcherFactories.containsKey(key)) {
-                    CommandDispatcherFactory commandDispatcherFactory = commandDispatcherFactories.get(key).get();
+                    BroadcastCommandDispatcherFactory commandDispatcherFactory = commandDispatcherFactories.get(key).get();
                     String clusterName = clusterNames.get(key);
                     config = DiscoveryGroupAdd.createDiscoveryGroupConfiguration(name, discoveryGroupConfiguration, commandDispatcherFactory, clusterName);
                 } else {
@@ -631,7 +628,7 @@ public class ExternalPooledConnectionFactoryService implements Service<ExternalP
     public void stop(StopContext context) {
         // Service context takes care of this
     }
-    public CommandDispatcherFactory getCommandDispatcherFactory(String name) {
+    public BroadcastCommandDispatcherFactory getCommandDispatcherFactory(String name) {
         return this.commandDispatcherFactories.get(name).get();
     }
 }
