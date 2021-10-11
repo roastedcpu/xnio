@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 import org.infinispan.Cache;
 import org.infinispan.affinity.KeyAffinityService;
 import org.infinispan.affinity.KeyGenerator;
-import org.infinispan.affinity.impl.KeyAffinityServiceImpl;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.remoting.transport.Address;
@@ -48,6 +47,7 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.threads.JBossThreadFactory;
+import org.wildfly.clustering.infinispan.spi.affinity.DefaultKeyAffinityService;
 import org.wildfly.clustering.infinispan.spi.affinity.KeyAffinityServiceFactory;
 import org.wildfly.clustering.service.AsyncServiceConfigurator;
 import org.wildfly.clustering.service.FunctionalService;
@@ -88,7 +88,7 @@ public class KeyAffinityServiceFactoryServiceConfigurator extends CapabilityServ
                 Configuration config = cache.getCacheConfiguration();
                 CacheMode mode = config.clustering().cacheMode();
                 // Invalidation caches map all keys to a single segment - thus have no specific affinity
-                return mode.needsStateTransfer() ? new KeyAffinityServiceImpl<>(executor, cache, generator, bufferSize, Collections.singleton(cache.getCacheManager().getAddress()), false) : new SimpleKeyAffinityService<>(generator);
+                return mode.needsStateTransfer() ? new DefaultKeyAffinityService<>(executor, cache, generator, bufferSize, Collections.singleton(cache.getCacheManager().getAddress())) : new SimpleKeyAffinityService<>(generator);
             }
         };
     }
