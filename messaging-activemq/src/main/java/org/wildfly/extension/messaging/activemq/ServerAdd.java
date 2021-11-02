@@ -43,6 +43,7 @@ import static org.wildfly.extension.messaging.activemq.CommonAttributes.NAME;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.OUTGOING_INTERCEPTORS;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.PAGING_DIRECTORY;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.SECURITY_SETTING;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.SOCKET_BINDING;
 import static org.wildfly.extension.messaging.activemq.PathDefinition.PATHS;
 import static org.wildfly.extension.messaging.activemq.PathDefinition.RELATIVE_TO;
 import static org.wildfly.extension.messaging.activemq.ServerDefinition.ASYNC_CONNECTION_EXECUTION_ENABLED;
@@ -392,11 +393,16 @@ class ServerAdd extends AbstractAddStepHandler {
                         commandDispatcherFactories.put(key, serviceBuilder.requires(MessagingServices.getBroadcastCommandDispatcherFactoryServiceName(channelName)));
                         String clusterName = JGROUPS_CLUSTER.resolveModelAttribute(context, broadcastGroupModel).asString();
                         clusterNames.put(key, clusterName);
-                    } else {
+                    } else if (broadcastGroupModel.hasDefined(SOCKET_BINDING.getName())) {
                         final ServiceName groupBindingServiceName = GroupBindingService.getBroadcastBaseServiceName(activeMQServiceName).append(name);
                         if (!groupBindingServices.containsKey(groupBindingServiceName)) {
                             Supplier<SocketBinding> groupBinding = serviceBuilder.requires(groupBindingServiceName);
                             groupBindingServices.put(groupBindingServiceName, groupBinding);
+
+                            GroupBindingService bindingService = new GroupBindingService();
+                            serviceTarget.addService(groupBindingServiceName, bindingService)
+                                    .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(SOCKET_BINDING.resolveModelAttribute(context, broadcastGroupModel).asString()), SocketBinding.class, bindingService.getBindingRef())
+                                    .install();
                         }
                         groupBindings.put(key, groupBindingServices.get(groupBindingServiceName));
                     }
@@ -413,11 +419,16 @@ class ServerAdd extends AbstractAddStepHandler {
                         commandDispatcherFactories.put(key, serviceBuilder.requires(MessagingServices.getBroadcastCommandDispatcherFactoryServiceName(channelName)));
                         String clusterName = JGROUPS_CLUSTER.resolveModelAttribute(context, discoveryGroupModel).asString();
                         clusterNames.put(key, clusterName);
-                    } else {
+                    } else if (discoveryGroupModel.hasDefined(SOCKET_BINDING.getName())) {
                         final ServiceName groupBindingServiceName = GroupBindingService.getDiscoveryBaseServiceName(activeMQServiceName).append(name);
                         if (!groupBindingServices.containsKey(groupBindingServiceName)) {
                             Supplier<SocketBinding> groupBinding = serviceBuilder.requires(groupBindingServiceName);
                             groupBindingServices.put(groupBindingServiceName, groupBinding);
+
+                            GroupBindingService bindingService = new GroupBindingService();
+                            serviceTarget.addService(groupBindingServiceName, bindingService)
+                                    .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(SOCKET_BINDING.resolveModelAttribute(context, discoveryGroupModel).asString()), SocketBinding.class, bindingService.getBindingRef())
+                                    .install();
                         }
                         groupBindings.put(key, groupBindingServices.get(groupBindingServiceName));
                     }
