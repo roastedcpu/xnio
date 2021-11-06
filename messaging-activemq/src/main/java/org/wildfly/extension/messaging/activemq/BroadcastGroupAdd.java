@@ -22,12 +22,11 @@
 
 package org.wildfly.extension.messaging.activemq;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING;
 import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.CAPABILITY;
 import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.CONNECTOR_REFS;
-import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.validateConnectors;
 import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.JGROUPS_CHANNEL;
 import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.JGROUPS_CHANNEL_FACTORY;
+import static org.wildfly.extension.messaging.activemq.BroadcastGroupDefinition.validateConnectors;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.JGROUPS_CLUSTER;
 
 import java.util.ArrayList;
@@ -37,21 +36,17 @@ import java.util.Set;
 import org.apache.activemq.artemis.api.core.BroadcastEndpointFactory;
 import org.apache.activemq.artemis.api.core.BroadcastGroupConfiguration;
 import org.apache.activemq.artemis.api.core.UDPBroadcastEndpointFactory;
-import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationStepHandler;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ReloadRequiredAddStepHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceRegistry;
-import org.jboss.msc.service.ServiceTarget;
 import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
 import org.wildfly.extension.messaging.activemq.broadcast.BroadcastCommandDispatcherFactory;
 import org.wildfly.extension.messaging.activemq.broadcast.CommandDispatcherBroadcastEndpointFactory;
@@ -62,7 +57,7 @@ import org.wildfly.extension.messaging.activemq.logging.MessagingLogger;
  *
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  */
-public class BroadcastGroupAdd extends AbstractAddStepHandler {
+public class BroadcastGroupAdd extends ReloadRequiredAddStepHandler {
 
     public static final BroadcastGroupAdd INSTANCE = new BroadcastGroupAdd();
 
@@ -113,29 +108,6 @@ public class BroadcastGroupAdd extends AbstractAddStepHandler {
                     validateConnectors(context, operation, connectorRefs);
                 }
             }, OperationContext.Stage.MODEL);
-        }
-    }
-
-    @Override
-    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-
-        ServiceRegistry registry = context.getServiceRegistry(false);
-        final ServiceName serviceName = MessagingServices.getActiveMQServiceName(PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR)));
-        ServiceController<?> service = registry.getService(serviceName);
-        if (service != null) {
-            context.reloadRequired();
-        } else {
-            final String name = context.getCurrentAddressValue();
-
-            final ServiceTarget target = context.getServiceTarget();
-            if (model.hasDefined(JGROUPS_CLUSTER.getName())) {
-                // nothing to do, in that case, the clustering.jgroups subsystem will have setup the stack
-            } else if(model.hasDefined(RemoteTransportDefinition.SOCKET_BINDING.getName())) {
-                final GroupBindingService bindingService = new GroupBindingService();
-                target.addService(GroupBindingService.getBroadcastBaseServiceName(serviceName).append(name), bindingService)
-                        .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(model.get(SOCKET_BINDING).asString()), SocketBinding.class, bindingService.getBindingRef())
-                        .install();
-            }
         }
     }
 

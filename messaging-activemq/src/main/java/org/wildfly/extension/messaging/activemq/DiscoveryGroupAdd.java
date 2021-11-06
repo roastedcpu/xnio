@@ -22,12 +22,10 @@
 
 package org.wildfly.extension.messaging.activemq;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.JGROUPS_CLUSTER;
 import static org.wildfly.extension.messaging.activemq.DiscoveryGroupDefinition.CAPABILITY;
 import static org.wildfly.extension.messaging.activemq.DiscoveryGroupDefinition.JGROUPS_CHANNEL;
 import static org.wildfly.extension.messaging.activemq.DiscoveryGroupDefinition.JGROUPS_CHANNEL_FACTORY;
-import static org.wildfly.extension.messaging.activemq.CommonAttributes.JGROUPS_CLUSTER;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,20 +33,16 @@ import java.util.Map;
 import org.apache.activemq.artemis.api.core.BroadcastEndpointFactory;
 import org.apache.activemq.artemis.api.core.DiscoveryGroupConfiguration;
 import org.apache.activemq.artemis.api.core.UDPBroadcastEndpointFactory;
-import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ReloadRequiredAddStepHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceRegistry;
-import org.jboss.msc.service.ServiceTarget;
 import org.wildfly.clustering.spi.ClusteringDefaultRequirement;
 import org.wildfly.extension.messaging.activemq.broadcast.BroadcastCommandDispatcherFactory;
 import org.wildfly.extension.messaging.activemq.broadcast.CommandDispatcherBroadcastEndpointFactory;
@@ -58,7 +52,7 @@ import org.wildfly.extension.messaging.activemq.broadcast.CommandDispatcherBroad
  *
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  */
-public class DiscoveryGroupAdd extends AbstractAddStepHandler {
+public class DiscoveryGroupAdd extends ReloadRequiredAddStepHandler {
 
     public static final DiscoveryGroupAdd INSTANCE = new DiscoveryGroupAdd();
 
@@ -104,32 +98,6 @@ public class DiscoveryGroupAdd extends AbstractAddStepHandler {
         ModelNode model = resource.getModel();
         if (JGROUPS_CLUSTER.resolveModelAttribute(context, model).isDefined() && !JGROUPS_CHANNEL.resolveModelAttribute(context, model).isDefined()) {
             context.registerAdditionalCapabilityRequirement(ClusteringDefaultRequirement.COMMAND_DISPATCHER_FACTORY.getName(), CAPABILITY.getDynamicName(address), JGROUPS_CHANNEL_FACTORY.getName());
-        }
-    }
-
-    @Override
-    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-
-        final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
-        final String name = address.getLastElement().getValue();
-        ServiceRegistry registry = context.getServiceRegistry(false);
-        ServiceName serviceName = MessagingServices.getActiveMQServiceName(PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR)));
-        ServiceController<?> service = serviceName == null ? null : registry.getService(serviceName);
-        if (service != null) {
-            context.reloadRequired();
-        } else {
-            final ServiceTarget target = context.getServiceTarget();
-            if (model.hasDefined(JGROUPS_CLUSTER.getName())) {
-                // nothing to do, in that case, the clustering.jgroups subsystem will have setup the stack
-            } else if(model.hasDefined(RemoteTransportDefinition.SOCKET_BINDING.getName())) {
-                if(serviceName == null) {
-                    serviceName = MessagingServices.getActiveMQServiceName((String) null);
-                }
-                final GroupBindingService bindingService = new GroupBindingService();
-                target.addService(GroupBindingService.getDiscoveryBaseServiceName(serviceName).append(name), bindingService)
-                        .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(model.get(SOCKET_BINDING).asString()), SocketBinding.class, bindingService.getBindingRef())
-                        .install();
-            }
         }
     }
 

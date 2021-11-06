@@ -28,6 +28,7 @@ import static org.jboss.as.weld.Capabilities.WELD_CAPABILITY_NAME;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.BROADCAST_GROUP;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.DISCOVERY_GROUP;
 import static org.wildfly.extension.messaging.activemq.CommonAttributes.JGROUPS_CLUSTER;
+import static org.wildfly.extension.messaging.activemq.CommonAttributes.SOCKET_BINDING;
 import static org.wildfly.extension.messaging.activemq.MessagingSubsystemRootResourceDefinition.CONFIGURATION_CAPABILITY;
 import static org.wildfly.extension.messaging.activemq.MessagingSubsystemRootResourceDefinition.GLOBAL_CLIENT_SCHEDULED_THREAD_POOL_MAX_SIZE;
 import static org.wildfly.extension.messaging.activemq.MessagingSubsystemRootResourceDefinition.GLOBAL_CLIENT_THREAD_POOL_MAX_SIZE;
@@ -204,10 +205,15 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         commandDispatcherFactories.put(key, MessagingServices.getBroadcastCommandDispatcherFactoryServiceName(channelName));
                         String clusterName = JGROUPS_CLUSTER.resolveModelAttribute(context, broadcastGroupModel).asString();
                         clusterNames.put(key, clusterName);
-                    } else {
+                    } else if (broadcastGroupModel.hasDefined(SOCKET_BINDING.getName())) {
                         final ServiceName groupBindingServiceName = GroupBindingService.getBroadcastBaseServiceName(JBOSS_MESSAGING_ACTIVEMQ).append(name);
                         if (!groupBindingServices.contains(groupBindingServiceName)) {
                             groupBindingServices.add(groupBindingServiceName);
+
+                            GroupBindingService bindingService = new GroupBindingService();
+                            serviceTarget.addService(groupBindingServiceName, bindingService)
+                            .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(SOCKET_BINDING.resolveModelAttribute(context, broadcastGroupModel).asString()), SocketBinding.class, bindingService.getBindingRef())
+                                    .install();
                         }
                         groupBindings.put(key, groupBindingServiceName);
                     }
@@ -222,10 +228,15 @@ class MessagingSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         commandDispatcherFactories.put(key, MessagingServices.getBroadcastCommandDispatcherFactoryServiceName(channelName));
                         String clusterName = JGROUPS_CLUSTER.resolveModelAttribute(context, discoveryGroupModel).asString();
                         clusterNames.put(key, clusterName);
-                    } else {
+                    } else if (discoveryGroupModel.hasDefined(SOCKET_BINDING.getName())) {
                         final ServiceName groupBindingServiceName = GroupBindingService.getDiscoveryBaseServiceName(JBOSS_MESSAGING_ACTIVEMQ).append(name);
                         if (!groupBindingServices.contains(groupBindingServiceName)) {
                             groupBindingServices.add(groupBindingServiceName);
+
+                            GroupBindingService bindingService = new GroupBindingService();
+                            serviceTarget.addService(groupBindingServiceName, bindingService)
+                                    .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(SOCKET_BINDING.resolveModelAttribute(context, discoveryGroupModel).asString()), SocketBinding.class, bindingService.getBindingRef())
+                                    .install();
                         }
                         groupBindings.put(key, groupBindingServiceName);
                     }
