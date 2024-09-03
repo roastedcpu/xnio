@@ -1,1 +1,1 @@
-Red Hat JBoss Enterprise Application Platform - Version 7.3.11.GA
+Red Hat JBoss Enterprise Application Platform - Version 7.3.10.GA
