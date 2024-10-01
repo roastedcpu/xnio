@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.xnio._private.Messages.futureMsg;
 
@@ -41,6 +42,482 @@ public abstract class AbstractIoFuture<T> implements IoFuture<T> {
     private List<Cancellable> cancellables;
 
     private static final List<Cancellable> CANCEL_REQUESTED = Collections.emptyList();
+
+    private static final State<?> ST_INITIAL = new InitialState<>();
+    private static final State<?> ST_CANCELLED = new CancelledState<>();
+
+    static abstract class State<T> {
+        abstract Status getStatus();
+
+        abstract void notifyDone(AbstractIoFuture<T> future, T result);
+
+        abstract void notifyFailed(AbstractIoFuture<T> future, IOException exception);
+
+        abstract void notifyCancelled(AbstractIoFuture<T> future);
+
+        abstract void cancel();
+
+        abstract boolean cancelRequested();
+
+        State<T> withWaiter(final Thread thread) {
+            return new WaiterState<T>(this, thread);
+        }
+
+        <A> State<T> withNotifier(final Executor executor, final AbstractIoFuture<T> future, final Notifier<? super T, A> notifier, final A attachment) {
+            return new NotifierState<T, A>(this, notifier, attachment);
+        }
+
+        State<T> withCancelHandler(final Cancellable cancellable) {
+            return new CancellableState<T>(this, cancellable);
+        }
+
+        T getResult() {
+            throw new IllegalStateException();
+        }
+
+        IOException getException() {
+            throw new IllegalStateException();
+        }
+    }
+
+    private static abstract class NestedState<T> extends State<T> {
+        private final State<T> next;
+
+        public NestedState(final State next) {
+            this.next = next;
+        }
+
+        /**
+         * Perform any actions that need to be executed when future is done, delegation of done notification to next is
+         * taken care of by invoker.
+         *
+         * @param future the future
+         * @param result the result
+         */
+        protected abstract void doNotifyDone(AbstractIoFuture<T> future, T result);
+
+        @Override
+        public void notifyDone(AbstractIoFuture<T> future, T result) {
+            doNotifyDone(future, result);
+            if (next instanceof NestedState) {
+                NestedState<T> current = this;
+                do {
+                    current = (NestedState<T>) current.next;
+                    current.doNotifyDone(future, result);
+                } while (current.next instanceof NestedState);
+                current.next.notifyDone(future, result);
+            } else {
+                next.notifyDone(future, result);
+            }
+
+        }
+
+        /**
+         * Perform any actions that need to be done at this state for handling failure, delegation of failure
+         * notification to next is taken care of by invoker
+         *
+         * @param future    the future
+         * @param exception the failure
+         */
+        protected abstract void doNotifyFailed(AbstractIoFuture<T> future, IOException exception);
+
+        @Override
+        public void notifyFailed(AbstractIoFuture<T> future, IOException exception) {
+            doNotifyFailed(future, exception);
+            if (next instanceof NestedState) {
+                NestedState<T> current = this;
+                do {
+                    current = (NestedState<T>) current.next;
+                    current.doNotifyFailed(future, exception);
+                } while (current.next instanceof NestedState);
+                current.next.notifyFailed(future, exception);
+            } else {
+                next.notifyFailed(future, exception);
+            }
+        }
+
+        /**
+         * Perform any actions that need to be done at this state for handling cancellation, delegation of cancellation
+         * notification to next is taken care of by invoker
+         *
+         * @param future the future
+         */
+        protected abstract void doNotifyCancelled(AbstractIoFuture<T> future);
+
+
+
+        @Override
+        public void notifyCancelled(AbstractIoFuture<T> future) {
+            doNotifyCancelled(future);
+            if (next instanceof NestedState) {
+                NestedState<T> current = this;
+                do {
+                    current = (NestedState<T>) current.next;
+                    current.doNotifyCancelled(future);
+                } while (current.next instanceof NestedState);
+                current.next.notifyCancelled(future);
+            } else {
+                next.notifyCancelled(future);
+            }
+        }
+
+        /**
+         * Perform any actions that need to be done at this state for cancellation. Delegation of cancellation to next
+         * is taken care of by invoker.
+         */
+        protected abstract void doCancel();
+
+        /**
+         * Just delegate cancel() to first next state in the nested chain that is not a NestedState.
+         */
+        @Override
+        public void cancel() {
+            doCancel();
+            if (next instanceof NestedState) {
+                NestedState<T> current = this;
+                do {
+                    current = (NestedState<T>) current.next;
+                    current.doCancel();
+                } while (current.next instanceof NestedState);
+                current.next.cancel();
+            } else {
+                next.cancel();
+            }
+        }
+
+        /**
+         * Return {@code true} to indicate that, at this state, cancel is requested. If returns false, invoker
+         * will check for inner next states in the chain until it finds a positive result or the final state in the
+         * chain.
+         *
+         * @return {@code true} to indicate that cancel is requested; {@code false} to delegate response to nested
+         *         state.
+         */
+        protected abstract boolean isCancelRequested();
+
+        @Override
+        public boolean cancelRequested() {
+            if (isCancelRequested()) {
+                return true;
+            }
+            if (next instanceof NestedState) {
+                NestedState<T> current = this;
+                do {
+                    current = (NestedState<T>) current.next;
+                    if (current.isCancelRequested()) {
+                        return true;
+                    }
+                } while (current.next instanceof NestedState);
+                return current.next.cancelRequested();
+            } else {
+                return next.cancelRequested();
+            }
+        }
+    }
+
+    static final class InitialState<T> extends State<T> {
+
+        Status getStatus() {
+            return Status.WAITING;
+        }
+
+        void notifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        void notifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        void notifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        void cancel() {
+        }
+
+        boolean cancelRequested() {
+            return false;
+        }
+    }
+
+    static final class CompleteState<T> extends State<T> {
+        private final T result;
+
+        CompleteState(final T result) {
+            this.result = result;
+        }
+
+        Status getStatus() {
+            return Status.DONE;
+        }
+
+        void notifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        void notifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        void notifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        void cancel() {
+        }
+
+        State<T> withCancelHandler(final Cancellable cancellable) {
+            return this;
+        }
+
+        State<T> withWaiter(final Thread thread) {
+            return this;
+        }
+
+        <A> State<T> withNotifier(final Executor executor, final AbstractIoFuture<T> future, final Notifier<? super T, A> notifier, final A attachment) {
+            future.runNotifier(new NotifierRunnable<T, A>(notifier, future, attachment));
+            return this;
+        }
+
+        T getResult() {
+            return result;
+        }
+
+        boolean cancelRequested() {
+            return false;
+        }
+    }
+
+    static final class FailedState<T> extends State<T> {
+        private final IOException exception;
+
+        FailedState(final IOException exception) {
+            this.exception = exception;
+        }
+
+        Status getStatus() {
+            return Status.FAILED;
+        }
+
+        void notifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        void notifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        void notifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        void cancel() {
+        }
+
+        State<T> withCancelHandler(final Cancellable cancellable) {
+            return this;
+        }
+
+        State<T> withWaiter(final Thread thread) {
+            return this;
+        }
+
+        <A> State<T> withNotifier(final Executor executor, final AbstractIoFuture<T> future, final Notifier<? super T, A> notifier, final A attachment) {
+            future.runNotifier(new NotifierRunnable<T, A>(notifier, future, attachment));
+            return this;
+        }
+
+        IOException getException() {
+            return exception;
+        }
+
+        boolean cancelRequested() {
+            return false;
+        }
+    }
+
+    static final class CancelledState<T> extends State<T> {
+
+        CancelledState() {
+        }
+
+        Status getStatus() {
+            return Status.CANCELLED;
+        }
+
+        void notifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        void notifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        void notifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        void cancel() {
+        }
+
+        State<T> withCancelHandler(final Cancellable cancellable) {
+            try {
+                cancellable.cancel();
+            } catch (Throwable ignored) {}
+            return this;
+        }
+
+        <A> State<T> withNotifier(final Executor executor, final AbstractIoFuture<T> future, final Notifier<? super T, A> notifier, final A attachment) {
+            future.runNotifier(new NotifierRunnable<T, A>(notifier, future, attachment));
+            return this;
+        }
+
+        State<T> withWaiter(final Thread thread) {
+            return this;
+        }
+
+        boolean cancelRequested() {
+            return true;
+        }
+    }
+
+    static final class NotifierState<T, A> extends NestedState<T> {
+        final Notifier<? super T, A> notifier;
+        final A attachment;
+
+        NotifierState(final State<T> next, final Notifier<? super T, A> notifier, final A attachment) {
+            super(next);
+            this.notifier = notifier;
+            this.attachment = attachment;
+        }
+
+        Status getStatus() {
+            return Status.WAITING;
+        }
+
+        @Override
+        protected void doNotifyDone(final AbstractIoFuture<T> future, final T result) {
+            doNotify(future);
+        }
+
+        @Override
+        protected void doNotifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+            doNotify(future);
+        }
+
+        @Override
+        protected void doNotifyCancelled(final AbstractIoFuture<T> future) {
+            doNotify(future);
+        }
+
+        @Override
+        protected void doCancel() {
+        }
+
+        private void doNotify(final AbstractIoFuture<T> future) {
+            future.runNotifier(new NotifierRunnable<T, A>(notifier, future, attachment));
+        }
+
+        @Override
+        protected boolean isCancelRequested() {
+            return false;
+        }
+    }
+
+    static final class WaiterState<T> extends NestedState<T> {
+        final Thread waiter;
+
+        WaiterState(final State<T> next, final Thread waiter) {
+            super(next);
+            this.waiter = waiter;
+        }
+
+        Status getStatus() {
+            return Status.WAITING;
+        }
+
+        @Override
+        protected void doNotifyDone(final AbstractIoFuture<T> future, final T result) {
+            LockSupport.unpark(waiter);
+        }
+
+        @Override
+        protected void doNotifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+            LockSupport.unpark(waiter);
+        }
+
+        @Override
+        protected void doNotifyCancelled(final AbstractIoFuture<T> future) {
+            LockSupport.unpark(waiter);
+        }
+
+        @Override
+        protected void doCancel() {}
+
+        @Override
+        protected boolean isCancelRequested() {
+            return false;
+        }
+    }
+
+    static final class CancellableState<T> extends NestedState<T> {
+        final Cancellable cancellable;
+
+        CancellableState(final State<T> next, final Cancellable cancellable) {
+            super(next);
+            this.cancellable = cancellable;
+        }
+
+        Status getStatus() {
+            return Status.WAITING;
+        }
+
+        @Override
+        protected void doNotifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        @Override
+        protected void doNotifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        @Override
+        protected void doNotifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        @Override
+        protected void doCancel() {
+            try {
+                cancellable.cancel();
+            } catch (Throwable ignored) {}
+        }
+
+        @Override
+        protected boolean isCancelRequested() {
+            return false;
+        }
+    }
+
+    static final class CancelRequestedState<T> extends NestedState<T> {
+
+        CancelRequestedState(final State<T> next) {
+            super(next);
+        }
+
+        Status getStatus() {
+            return Status.WAITING;
+        }
+
+        @Override
+        protected void doNotifyDone(final AbstractIoFuture<T> future, final T result) {
+        }
+
+        @Override
+        protected void doNotifyFailed(final AbstractIoFuture<T> future, final IOException exception) {
+        }
+
+        @Override
+        protected void doNotifyCancelled(final AbstractIoFuture<T> future) {
+        }
+
+        @Override
+        protected void doCancel() {
+            // terminate
+        }
+
+        @Override
+        protected boolean isCancelRequested() {
+            return true;
+        }
+    }
 
     /**
      * Construct a new instance.
@@ -363,4 +840,26 @@ public abstract class AbstractIoFuture<T> implements IoFuture<T> {
     protected Executor getNotifierExecutor() {
         return IoUtils.directExecutor();
     }
+
+    static class NotifierRunnable<T, A> implements Runnable {
+
+        private final Notifier<? super T, A> notifier;
+        private final IoFuture<T> future;
+        private final A attachment;
+
+        NotifierRunnable(final Notifier<? super T, A> notifier, final IoFuture<T> future, final A attachment) {
+            this.notifier = notifier;
+            this.future = future;
+            this.attachment = attachment;
+        }
+
+        public void run() {
+            try {
+                notifier.notify(future, attachment);
+            } catch (Throwable t) {
+                futureMsg.notifierFailed(t, notifier);
+            }
+        }
+    }
+
 }
