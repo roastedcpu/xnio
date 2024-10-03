@@ -133,7 +133,7 @@
         <!-- Other release identification information that drives how the built server identifies itself -->
         <full.dist.product.release.name>JBoss EAP</full.dist.product.release.name>
         <full.dist.product.slot>eap</full.dist.product.slot>
-        <full.dist.product.release.version>7.3.11.GA</full.dist.product.release.version>
+        <full.dist.product.release.version>7.3.10.GA</full.dist.product.release.version>
         <full.maven.groupId>${project.groupId}</full.maven.groupId>
         <full.maven.version>${project.version}</full.maven.version>
         <ee.dist.product.release.name>${full.dist.product.release.name}</ee.dist.product.release.name>
@@ -145,7 +145,7 @@
         <servlet.dist.product.slot>wildfly-web</servlet.dist.product.slot>
         <servlet.dist.product.release.version>${ee.dist.product.release.version}</servlet.dist.product.release.version>
         <expansion.pack.release.name>JBoss EAP XP</expansion.pack.release.name>
-        <expansion.pack.release.version>1.0.10.GA</expansion.pack.release.version>
+        <expansion.pack.release.version>1.0.9.GA</expansion.pack.release.version>
         <jboss.eap.release.version>7.3</jboss.eap.release.version>
         <product.docs.server.version>18</product.docs.server.version>
         <!-- A short variant of product.release.version used in 'startsWith' tests done by dist verification logic -->
@@ -271,7 +271,7 @@
         <version.com.google.code.gson>2.8.2.redhat-5</version.com.google.code.gson>
         <version.com.google.guava>30.1.0.redhat-00001</version.com.google.guava>
         <version.com.google.guava.failureaccess>1.0.1.redhat-00002</version.com.google.guava.failureaccess>
-        <version.com.h2database>1.4.197.redhat-00004</version.com.h2database>
+        <version.com.h2database>1.4.193.redhat-2</version.com.h2database>
         <version.com.microsoft.azure>6.1.0.redhat-1</version.com.microsoft.azure>
         <version.com.nimbus.jose-jwt>8.11</version.com.nimbus.jose-jwt>
         <version.com.squareup.okhttp3>3.9.0.redhat-3</version.com.squareup.okhttp3>
@@ -327,7 +327,7 @@
         <version.org.apache.activemq.artemis.native>1.0.2.redhat-00001</version.org.apache.activemq.artemis.native>
         <version.org.apache.activemq.libartemis.native>1.0.2-redhat-1</version.org.apache.activemq.libartemis.native>
         <version.org.apache.avro>1.7.6.redhat-2</version.org.apache.avro>
-        <version.org.apache.cxf>3.4.10.SP1-redhat-00001</version.org.apache.cxf>
+        <version.org.apache.cxf>3.3.12.redhat-00001</version.org.apache.cxf>
         <version.org.apache.cxf.xjcplugins>3.3.0.redhat-00001</version.org.apache.cxf.xjcplugins>
         <version.org.apache.ds>2.0.0-M24</version.org.apache.ds>
         <version.org.apache.httpcomponents.httpasyncclient>4.1.4.redhat-00001</version.org.apache.httpcomponents.httpasyncclient>
@@ -337,12 +337,12 @@
         <version.org.apache.myfaces.core>2.3.1</version.org.apache.myfaces.core>
         <version.org.apache.neethi>3.1.1.redhat-1</version.org.apache.neethi>
         <version.org.apache.openjpa>2.4.2</version.org.apache.openjpa>
-        <version.org.apache.santuario>2.2.3.redhat-00001</version.org.apache.santuario>
+        <version.org.apache.santuario>2.1.7.redhat-00001</version.org.apache.santuario>
         <version.org.apache.thrift>0.13.0.redhat-00002</version.org.apache.thrift>
         <version.org.apache.velocity>2.3.0.redhat-00001</version.org.apache.velocity>
-        <version.org.apache.ws.security>2.3.3.redhat-00001</version.org.apache.ws.security>
+        <version.org.apache.ws.security>2.2.7.redhat-00001</version.org.apache.ws.security>
         <version.org.apache.ws.xmlschema>2.2.5.redhat-00001</version.org.apache.ws.xmlschema>
-        <version.org.apache.xalan>2.7.1.redhat-00015</version.org.apache.xalan>
+        <version.org.apache.xalan>2.7.1.redhat-00013</version.org.apache.xalan>
         <version.org.bitbucket.jose4j>0.6.5.redhat-00002</version.org.bitbucket.jose4j>
         <version.org.bouncycastle>1.68.0.redhat-00005</version.org.bouncycastle>
         <version.org.bytebuddy>1.9.11.redhat-00002</version.org.bytebuddy>
@@ -3898,10 +3898,6 @@
                 <artifactId>cxf-rt-ws-security</artifactId>
                 <version>${version.org.apache.cxf}</version>
                 <exclusions>
-                    <exclusion>
-                        <groupId>org.ehcache</groupId>
-                        <artifactId>ehcache</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>net.sf.ehcache</groupId>
                         <artifactId>ehcache-core</artifactId>
